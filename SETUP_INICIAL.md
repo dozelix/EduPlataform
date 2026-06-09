@@ -88,59 +88,147 @@ NODE_ENV=development
 
 ---
 
-## 4️⃣ Setup de Carpetas Base
+## 4️⃣ Setup de Carpetas Base (Monorepo)
 
 El líder del proyecto debe crear:
 
 ```bash
-# Crear estructura base
-mkdir -p src/main src/renderer src/db src/shared
+# Crear estructura monorepo
+mkdir -p packages/main/src/{ipc,db/models,services}
+mkdir -p packages/renderer/src/{features,components,hooks,stores,types,styles,utils}
+mkdir -p packages/shared/src/{types,constants,utils,validation,ipc}
 mkdir -p tests/{unit,integration,e2e}
-mkdir -p docs config scripts public
+mkdir -p docs .github/workflows
 
-# Crear .gitkeep en carpetas importantes (para que Git trackee directorios vacíos)
-touch src/main/.gitkeep
-touch src/renderer/.gitkeep
-touch src/db/models/.gitkeep
+# Crear .gitkeep (para que Git trackee directorios vacíos)
+touch packages/main/src/db/models/.gitkeep
+touch packages/main/src/ipc/.gitkeep
+touch packages/renderer/src/features/.gitkeep
+touch packages/shared/src/types/.gitkeep
 ```
 
 ---
 
-## 5️⃣ Configuración de TypeScript
+## 5️⃣ Configurar package.json Root (Monorepo)
 
-Crear `tsconfig.json`:
+Crear `package.json` en la raíz:
+
+```json
+{
+  "name": "clinic-pc",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm:dev:main\" \"npm:dev:renderer\"",
+    "dev:main": "cross-env NODE_ENV=development ts-node packages/main/src/index.ts",
+    "dev:renderer": "vite --config packages/renderer/vite.config.ts",
+    "build": "npm run build:main && npm run build:renderer",
+    "build:main": "tsc -p packages/main/tsconfig.json",
+    "build:renderer": "vite build --config packages/renderer/vite.config.ts",
+    "electron": "electron packages/main/dist/index.js",
+    "electron:dev": "concurrently \"npm run dev:renderer\" \"wait-on http://localhost:5173 && npm run electron\"",
+    "lint": "eslint packages/*/src --ext .ts,.tsx",
+    "format": "prettier --write \"packages/*/src/**/*.{ts,tsx,json,css}\"",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^latest",
+    "concurrently": "^8.0.0",
+    "cross-env": "^7.0.0",
+    "electron": "^latest",
+    "electron-builder": "^latest",
+    "eslint": "^latest",
+    "prettier": "^latest",
+    "ts-node": "^latest",
+    "typescript": "^5.0.0",
+    "vite": "^5.0.0",
+    "vitest": "^latest",
+    "wait-on": "^latest"
+  }
+}
+```
+
+Instalar con `npm install` desde la raíz. npm manejará los workspaces automáticamente.
+
+---
+
+## 6️⃣ Configuración de TypeScript (Monorepo)
+
+Crear `tsconfig.json` (raíz):
 
 ```json
 {
   "compilerOptions": {
     "target": "ES2020",
-    "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
-    "skipLibCheck": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "strict": true,
-    "jsx": "react-jsx",
-    "moduleResolution": "bundler",
+    "skipLibCheck": true,
     "resolveJsonModule": true,
+    "moduleResolution": "bundler"
+  }
+}
+```
+
+Crear `packages/main/tsconfig.json`:
+
+```json
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": ["ES2020"],
+    "module": "CommonJS",
+    "outDir": "./dist",
+    "rootDir": "./src",
     "paths": {
       "@/*": ["./src/*"],
-      "@/components/*": ["./src/renderer/components/*"],
-      "@/hooks/*": ["./src/renderer/hooks/*"],
-      "@/stores/*": ["./src/renderer/stores/*"],
-      "@/types/*": ["./src/shared/types/*"],
-      "@/utils/*": ["./src/shared/utils/*"]
+      "@shared/*": ["../shared/src/*"]
     }
   },
-  "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": ["src"]
+}
+```
+
+Crear `packages/renderer/tsconfig.json`:
+
+```json
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "paths": {
+      "@/*": ["./src/*"],
+      "@shared/*": ["../shared/src/*"]
+    }
+  },
+  "include": ["src"]
+}
+```
+
+Crear `packages/shared/tsconfig.json`:
+
+```json
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "declaration": true,
+    "lib": ["ES2020"]
+  },
+  "include": ["src"]
 }
 ```
 
 ---
 
-## 6️⃣ Configuración de Vite
+## 7️⃣ Configuración de Vite (Renderer)
 
-Crear `vite.config.ts`:
+Crear `packages/renderer/vite.config.ts`:
 
 ```typescript
 import { defineConfig } from 'vite'
@@ -152,6 +240,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      '@shared': path.resolve(__dirname, '../shared/src'),
     },
   },
   build: {
@@ -166,23 +255,24 @@ export default defineConfig({
 
 ---
 
-## 7️⃣ Configuración de Electron
+## 8️⃣ Configuración de Electron (Main Process)
 
-Crear `src/main/index.ts`:
+Crear `packages/main/src/index.ts`:
 
 ```typescript
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron'
 import path from 'path'
-import isDev from 'electron-is-dev'
+import { connectDB, disconnectDB } from './db/connection'
 
-let mainWindow: BrowserWindow | null
+let mainWindow: BrowserWindow | null = null
+const isDev = process.env.NODE_ENV === 'development'
 
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.ts'),
+      preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
       contextIsolation: true,
     },
@@ -190,18 +280,29 @@ function createWindow() {
 
   const url = isDev
     ? 'http://localhost:5173'
-    : `file://${path.join(__dirname, '../renderer/index.html')}`
+    : `file://${path.join(__dirname, '../../renderer/dist/index.html')}`
 
   mainWindow.loadURL(url)
 
   if (isDev) {
     mainWindow.webContents.openDevTools()
   }
+
+  mainWindow.on('closed', () => {
+    mainWindow = null
+  })
 }
 
-app.on('ready', createWindow)
+app.on('ready', async () => {
+  await connectDB()
+  createWindow()
+  // Registrar IPC handlers
+  require('./ipc/userHandlers')
+  require('./ipc/productHandlers')
+})
 
-app.on('window-all-closed', () => {
+app.on('window-all-closed', async () => {
+  await disconnectDB()
   if (process.platform !== 'darwin') {
     app.quit()
   }
@@ -214,11 +315,26 @@ app.on('activate', () => {
 })
 ```
 
+Crear `packages/main/src/preload.ts`:
+
+```typescript
+import { contextBridge, ipcRenderer } from 'electron'
+
+contextBridge.exposeInMainWorld('api', {
+  invoke: (channel: string, ...args: any[]) => {
+    return ipcRenderer.invoke(channel, ...args)
+  },
+  on: (channel: string, callback: Function) => {
+    ipcRenderer.on(channel, (event, ...args) => callback(...args))
+  },
+})
+```
+
 ---
 
-## 8️⃣ Configuración de Mongoose (MongoDB)
+## 9️⃣ Configuración de Mongoose (MongoDB)
 
-Crear `src/db/connection.ts`:
+Crear `packages/main/src/db/connection.ts`:
 
 ```typescript
 import mongoose from 'mongoose'
@@ -245,22 +361,23 @@ export async function disconnectDB() {
 }
 ```
 
-Crear modelo ejemplo `src/db/models/User.ts`:
+Crear modelo ejemplo `packages/main/src/db/models/User.ts`:
 
 ```typescript
 import { Schema, model } from 'mongoose'
 
 interface IUser {
+  _id?: string
   name: string
   email: string
-  password: string
-  createdAt: Date
+  password?: string
+  createdAt?: Date
 }
 
 const userSchema = new Schema<IUser>({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
+  password: { type: String },
   createdAt: { type: Date, default: Date.now },
 })
 
@@ -269,28 +386,39 @@ export const User = model<IUser>('User', userSchema)
 
 ---
 
-## 9️⃣ Scripts en package.json
+## 🔟 IPC Handlers (Main Process)
 
-```json
-{
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "electron": "electron .",
-    "electron-dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
-    "electron-build": "npm run build && electron-builder",
-    "lint": "eslint src --ext .ts,.tsx",
-    "format": "prettier --write \"src/**/*.{ts,tsx,json,css}\"",
-    "test": "vitest",
-    "test:ui": "vitest --ui"
-  }
-}
+Crear `packages/main/src/ipc/userHandlers.ts`:
+
+```typescript
+import { ipcMain } from 'electron'
+import { User } from '../db/models/User'
+
+ipcMain.handle('user:get-all', async () => {
+  return await User.find()
+})
+
+ipcMain.handle('user:get-by-id', async (_, id: string) => {
+  return await User.findById(id)
+})
+
+ipcMain.handle('user:create', async (_, userData: any) => {
+  const user = new User(userData)
+  return await user.save()
+})
+
+ipcMain.handle('user:update', async (_, id: string, userData: any) => {
+  return await User.findByIdAndUpdate(id, userData, { new: true })
+})
+
+ipcMain.handle('user:delete', async (_, id: string) => {
+  return await User.findByIdAndDelete(id)
+})
 ```
 
 ---
 
-## 🔟 ESLint + Prettier
+## 1️⃣1️⃣ ESLint + Prettier
 
 Crear `.eslintrc.cjs`:
 
@@ -323,35 +451,45 @@ Crear `.prettierrc`:
 
 ---
 
-## 1️⃣1️⃣ Primer Servidor de Desarrollo
+## 1️⃣2️⃣ Primer Servidor de Desarrollo
+
+Desde la raíz del proyecto:
 
 ```bash
-# Terminal 1: Iniciar Vite (React frontend)
+# Instalar dependencias del monorepo
+npm install
+
+# Terminal 1: En dev, inicia ambos procesos en paralelo
 npm run dev
 
-# Terminal 2 (en otra ventana): Iniciar Electron
-npm run electron
+# O si prefieres hacerlo manual:
+# Terminal 1: Iniciar Vite (React frontend)
+npm run dev:renderer
 
-# O en 1 sola terminal:
-npm run electron-dev
+# Terminal 2: Iniciar Electron (Main process con MongoDB)
+npm run electron
 ```
 
-Debería abrir una ventana de Electron con la app React corriendo.
+Debería:
+1. Compilar `packages/main` con TypeScript
+2. Iniciar servidor Vite en http://localhost:5173
+3. Conectar MongoDB
+4. Abrir ventana de Electron con React app corriendo
 
 ---
 
-## 1️⃣2️⃣ Primera Prueba
+## 1️⃣3️⃣ Primera Prueba
 
 1. Crear rama
    ```bash
    git checkout -b feature/setup-inicial
    ```
 
-2. Hacer un cambio pequeño (ej: agregar texto en src/renderer)
+2. Hacer un cambio pequeño (ej: modificar `packages/renderer/src/App.tsx`)
 
 3. Hacer commit
    ```bash
-   git commit -m "chore(setup): configuración inicial completada"
+   git commit -m "chore(setup): configuración inicial monorepo completada"
    ```
 
 4. Push
@@ -372,6 +510,7 @@ Debería abrir una ventana de Electron con la app React corriendo.
 - [Mongoose Docs](https://mongoosejs.com/)
 - [React Docs](https://react.dev/)
 - [TypeScript Docs](https://www.typescriptlang.org/)
+- [npm Workspaces](https://docs.npmjs.com/cli/v7/using-npm/workspaces)
 
 ---
 
@@ -380,14 +519,18 @@ Debería abrir una ventana de Electron con la app React corriendo.
 - [ ] Node.js 18+ instalado
 - [ ] Git configurado con usuario local
 - [ ] Repo clonado
-- [ ] `npm install` completado
+- [ ] `npm install` completado desde raíz
 - [ ] `.env.local` creado
-- [ ] Carpetas base creadas
-- [ ] `package.json` configurado
-- [ ] `tsconfig.json` creado
-- [ ] `vite.config.ts` creado
-- [ ] Primer servidor de desarrollo funciona
-- [ ] ESLint y Prettier funcionan
+- [ ] Estructura monorepo `packages/` creada
+- [ ] `package.json` (raíz) con workspaces configurado
+- [ ] `tsconfig.json` (raíz y packages) creados
+- [ ] `packages/renderer/vite.config.ts` creado
+- [ ] `packages/main/src/index.ts` creado
+- [ ] `packages/main/src/preload.ts` creado
+- [ ] Mongoose connection configurada
+- [ ] Al menos un IPC handler registrado
+- [ ] `npm run dev` funciona correctamente
+- [ ] ESLint y Prettier funciona en todo el monorepo
 
 ---
 

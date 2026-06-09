@@ -245,38 +245,91 @@ function UserProfile() {
 
 ---
 
-## Manejo de API Calls
+## Manejo de IPC Communication (Sin Backend)
+
+### En Renderer (React)
 
 ```typescript
-// src/renderer/services/userService.ts
-import axios from 'axios'
-import type { User } from '@/features/users/types'
-
-const API_URL = import.meta.env.VITE_API_URL
+// packages/renderer/src/services/userService.ts
+import type { User } from '@shared/types/User'
 
 export const userService = {
   async getUsers(): Promise<User[]> {
-    const response = await axios.get(`${API_URL}/users`)
-    return response.data
+    return await window.api.invoke('user:get-all')
   },
 
   async getUserById(id: string): Promise<User> {
-    const response = await axios.get(`${API_URL}/users/${id}`)
-    return response.data
+    return await window.api.invoke('user:get-by-id', id)
   },
 
-  async createUser(user: Omit<User, 'id'>): Promise<User> {
-    const response = await axios.post(`${API_URL}/users`, user)
-    return response.data
+  async createUser(user: Omit<User, '_id'>): Promise<User> {
+    return await window.api.invoke('user:create', user)
   },
 
   async updateUser(id: string, user: Partial<User>): Promise<User> {
-    const response = await axios.put(`${API_URL}/users/${id}`, user)
-    return response.data
+    return await window.api.invoke('user:update', id, user)
   },
 
   async deleteUser(id: string): Promise<void> {
-    await axios.delete(`${API_URL}/users/${id}`)
+    return await window.api.invoke('user:delete', id)
+  },
+}
+```
+
+### En Main Process (Electron) - IPC Handlers
+
+```typescript
+// packages/main/src/ipc/userHandlers.ts
+import { ipcMain } from 'electron'
+import { userService } from '../services/userService'
+
+ipcMain.handle('user:get-all', async () => {
+  return await userService.getAllUsers()
+})
+
+ipcMain.handle('user:get-by-id', async (_, id: string) => {
+  return await userService.getUserById(id)
+})
+
+ipcMain.handle('user:create', async (_, userData: any) => {
+  return await userService.createUser(userData)
+})
+
+ipcMain.handle('user:update', async (_, id: string, userData: any) => {
+  return await userService.updateUser(id, userData)
+})
+
+ipcMain.handle('user:delete', async (_, id: string) => {
+  return await userService.deleteUser(id)
+})
+```
+
+### Service en Main (Mongoose Operations)
+
+```typescript
+// packages/main/src/services/userService.ts
+import { User } from '../db/models/User'
+
+export const userService = {
+  async getAllUsers() {
+    return await User.find()
+  },
+
+  async getUserById(id: string) {
+    return await User.findById(id)
+  },
+
+  async createUser(userData: any) {
+    const user = new User(userData)
+    return await user.save()
+  },
+
+  async updateUser(id: string, userData: any) {
+    return await User.findByIdAndUpdate(id, userData, { new: true })
+  },
+
+  async deleteUser(id: string) {
+    return await User.findByIdAndDelete(id)
   },
 }
 ```
