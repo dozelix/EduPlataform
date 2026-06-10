@@ -34,3 +34,7 @@ electron-builder-effective-config.yaml
 
 # Package locks (decidir en equipo si commitear o no)
 # package-lock.json
+
+
+#db
+*.sql
