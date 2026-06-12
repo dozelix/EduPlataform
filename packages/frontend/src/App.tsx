@@ -74,35 +74,35 @@ function App() {
 
   const navItems = [
     { id: 'dashboard', icon: '🏠', label: 'Dashboard' },
-    { id: 'users',     icon: '👥', label: 'Usuarios' },
-    { id: 'courses',   icon: '📚', label: 'Cursos' },
-    { id: 'grades',    icon: '📊', label: 'Calificaciones' },
-    { id: 'settings',  icon: '⚙️',  label: 'Configuración' },
+    { id: 'users', icon: '👥', label: 'Usuarios' },
+    { id: 'courses', icon: '📚', label: 'Cursos' },
+    { id: 'grades', icon: '📊', label: 'Calificaciones' },
+    { id: 'settings', icon: '⚙️', label: 'Configuración' },
   ]
 
   const statusLabel = {
-    idle:      'Sin conectar',
-    loading:   'Conectando...',
+    idle: 'Sin conectar',
+    loading: 'Conectando...',
     connected: 'MongoDB conectado',
-    error:     'Error de conexión',
+    error: 'Error de conexión',
   }[dbStatus]
 
   const statusDotClass = {
-    idle:      '',
-    loading:   '',
+    idle: '',
+    loading: '',
     connected: 'connected',
-    error:     'error',
+    error: 'error',
   }[dbStatus]
 
   const checklistItems = [
-    { label: 'React 18 + Vite 5',     done: true,      icon: '⚛️' },
-    { label: 'Electron 27',           done: true,      icon: '⚡' },
-    { label: 'Mongoose 8 (MongoDB)',  done: true,      icon: '🍃' },
-    { label: 'TypeScript 5',          done: true,      icon: '🔷' },
-    { label: 'Monorepo (npm workspaces)', done: true,  icon: '📦' },
-    { label: 'IPC Bridge seguro',     done: true,      icon: '🔒' },
-    { label: 'Shared types package',  done: true,      icon: '🤝' },
-    { label: 'ESLint + Prettier',     done: true,      icon: '✨' },
+    { label: 'React 18 + Vite 5', done: true, icon: '⚛️' },
+    { label: 'Electron 27', done: true, icon: '⚡' },
+    { label: 'Mongoose 8 (MongoDB)', done: true, icon: '🍃' },
+    { label: 'TypeScript 5', done: true, icon: '🔷' },
+    { label: 'Monorepo (npm workspaces)', done: true, icon: '📦' },
+    { label: 'IPC Bridge seguro', done: true, icon: '🔒' },
+    { label: 'Shared types package', done: true, icon: '🤝' },
+    { label: 'ESLint + Prettier', done: true, icon: '✨' },
   ]
 
   return (
@@ -163,10 +163,10 @@ function App() {
           {/* Stats */}
           <section className="stats-grid" aria-label="Estado del proyecto">
             {[
-              { icon: '📦', value: '3',    label: 'Paquetes (workspaces)',   badge: 'main • renderer • shared' },
-              { icon: '🔌', value: '5',    label: 'IPC Handlers (user)',      badge: 'CRUD completo' },
-              { icon: '🍃', value: '1',    label: 'Modelos Mongoose',         badge: 'User model' },
-              { icon: '🔒', value: '✓',    label: 'contextIsolation',         badge: 'Seguro' },
+              { icon: '📦', value: '3', label: 'Paquetes (workspaces)', badge: 'main • frontend • shared' },
+              { icon: '🔌', value: '5', label: 'IPC Handlers (user)', badge: 'CRUD completo' },
+              { icon: '🍃', value: '1', label: 'Modelos Mongoose', badge: 'User model' },
+              { icon: '🔒', value: '✓', label: 'contextIsolation', badge: 'Seguro' },
             ].map((s, i) => (
               <article
                 className="stat-card"

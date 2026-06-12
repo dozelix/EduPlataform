@@ -30,7 +30,7 @@ function createWindow() {
   // Cargar la URL del dev server o el build estático
   const url = isDev
     ? 'http://localhost:5173'
-    : `file://${path.join(__dirname, '../../renderer/dist/index.html')}`
+    : `file://${path.join(__dirname, '../../frontend/dist/index.html')}`
 
   mainWindow.loadURL(url)
 

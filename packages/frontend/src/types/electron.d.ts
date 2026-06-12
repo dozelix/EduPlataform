@@ -1,5 +1,5 @@
-import type { IpcChannel } from '../../main/src/ipc/../../../shared/src/ipc/channels'
-import type { IpcResponse } from '../../shared/src/types/ipcResponse'
+import type { IpcChannel } from '@/shared/src/ipc/channels'
+import type { IpcResponse } from '@/shared/src/types/ipcResponse'
 
 // ======================================================
 // Window type augmentation
@@ -16,4 +16,4 @@ declare global {
   }
 }
 
-export {}
+export { }

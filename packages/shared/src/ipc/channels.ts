@@ -1,6 +1,6 @@
 // ======================================================
 // SHARED TYPES — IPC Channels
-// Tipos de canales IPC compartidos entre main y renderer
+// Tipos de canales IPC compartidos entre main y frontend
 // ======================================================
 
 export const IPC_CHANNELS = {

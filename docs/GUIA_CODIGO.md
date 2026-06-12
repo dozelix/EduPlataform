@@ -54,7 +54,7 @@ let user = api.getUser()
 ## Organización de Archivos por Feature
 
 ```
-src/renderer/features/users/
+src/frontend/features/users/
 ├── components/
 │   ├── UserCard.tsx
 │   ├── UserForm.tsx

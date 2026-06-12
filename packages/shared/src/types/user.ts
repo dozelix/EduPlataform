@@ -1,6 +1,6 @@
 // ======================================================
 // SHARED TYPES — User
-// Interfaz compartida entre main (Mongoose) y renderer (React)
+// Interfaz compartida entre main (Mongoose) y frontend (React)
 // ======================================================
 
 export interface IUser {

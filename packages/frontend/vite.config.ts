@@ -4,7 +4,7 @@ import path from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  // Root es la carpeta del renderer (donde vive index.html)
+  // Root es la carpeta del frontend (donde vive index.html)
   root: path.resolve(__dirname),
   plugins: [react()],
   resolve: {

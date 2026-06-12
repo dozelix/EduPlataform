@@ -28,7 +28,7 @@ proyecto-clinic/
 │   │   ├── package.json
 │   │   └── tsconfig.json
 │   │
-│   ├── renderer/               # React + Vite Frontend
+│   ├── frontend/               # React + Vite Frontend
 │   │   ├── src/
 │   │   │   ├── components/
 │   │   │   │   ├── common/     # Componentes reutilizables
@@ -109,8 +109,8 @@ proyecto-clinic/
 └─────────────────────────────────────────────────────┘
            ↕ (IPC eventos)
 ┌─────────────────────────────────────────────────────┐
-│     RENDERER PROCESS (React + Vite)                │
-│     (packages/renderer)                            │
+│     FRONTEND PROCESS (React + Vite)                │
+│     (packages/frontend)                            │
 │                                                     │
 │  Components → Hooks → Services (IPC calls)         │
 │         ↓        ↓         ↓                       │
@@ -126,11 +126,11 @@ packages/shared → Tipos, constantes, validaciones compartidas
 
 ### Separación de Responsabilidades en Monorepo
 - **Main Process** (`packages/main`): Mongoose, operaciones DB, lógica de negocio
-- **Renderer Process** (`packages/renderer`): UI, estado local, llamadas IPC
+- **frontend Process** (`packages/frontend`): UI, estado local, llamadas IPC
 - **Shared** (`packages/shared`): Tipos, constantes, validaciones, esquemas IPC
 
 ### IPC Bridge Seguro
-- Comunicación controlada entre main y renderer
+- Comunicación controlada entre main y frontend
 - Preload script valida tipos
 - Sin acceso directo a Node.js desde React
 
@@ -159,7 +159,7 @@ import UserCard from '../../../../components/common/UserCard';
 ## 🗂️ Feature-Based Organization (Recomendado para escalabilidad)
 
 ```
-packages/renderer/src/features/
+packages/frontend/src/features/
 ├── users/
 │   ├── components/         # UI components
 │   ├── pages/             # Page components
@@ -194,10 +194,10 @@ packages/main/src/
 
 ## 🔗 IPC Communication Pattern
 
-El renderer comunica con main vía IPC (Inter-Process Communication):
+El frontend comunica con main vía IPC (Inter-Process Communication):
 
 ```typescript
-// En renderer (React component)
+// En frontend (React component)
 const response = await window.api.invoke('user:get-all')
 
 // En main (IPC handler)
