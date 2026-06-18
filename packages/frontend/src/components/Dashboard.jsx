@@ -192,38 +192,9 @@ const IconClock = () => (
   </svg>
 )
 
-type NavId = 'dashboard' | 'users' | 'courses' | 'grades' | 'settings'
-type CourseStatus = 'active' | 'review' | 'draft'
-type BadgeVariant = 'success' | 'primary' | 'accent' | 'warning'
-
-interface NavItem {
-  id: NavId
-  icon: React.ReactNode
-  label: string
-}
-
-interface StatData {
-  value: string
-  label: string
-  badge: string
-  badgeType: BadgeVariant
-  color: string
-}
-
-interface CourseCard {
-  title: string
-  instructor: string
-  students: number
-  rating: number
-  duration: string
-  status: CourseStatus
-  progress: number
-  accent: string
-}
-
 const MOCK_USER = { name: 'Jean', initials: 'JE' }
 
-const NAV_ITEMS: NavItem[] = [
+const NAV_ITEMS = [
   { id: 'dashboard', icon: <IconGrid />, label: 'Dashboard' },
   { id: 'users', icon: <IconUsers />, label: 'Usuarios' },
   { id: 'courses', icon: <IconBook />, label: 'Cursos' },
@@ -231,7 +202,7 @@ const NAV_ITEMS: NavItem[] = [
   { id: 'settings', icon: <IconSettings />, label: 'Configuración' },
 ]
 
-const STATS: StatData[] = [
+const STATS = [
   {
     value: '1,248',
     label: 'Estudiantes activos',
@@ -262,7 +233,7 @@ const STATS: StatData[] = [
   },
 ]
 
-const COURSES: CourseCard[] = [
+const COURSES = [
   {
     title: 'Introducción a JavaScript',
     instructor: 'Ana García',
@@ -325,20 +296,20 @@ const COURSES: CourseCard[] = [
   },
 ]
 
-const STATUS_LABELS: Record<CourseStatus, string> = {
+const STATUS_LABELS = {
   active: 'Activo',
   review: 'En revisión',
   draft: 'Borrador',
 }
 
 export default function Dashboard() {
-  const [activeNav, setActiveNav] = useState<NavId>('dashboard')
+  const [activeNav, setActiveNav] = useState('dashboard')
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Buenos días' : hour < 19 ? 'Buenas tardes' : 'Buenas noches'
 
-  const handleNav = (id: NavId) => {
+  const handleNav = (id) => {
     setActiveNav(id)
     setSidebarOpen(false)
   }

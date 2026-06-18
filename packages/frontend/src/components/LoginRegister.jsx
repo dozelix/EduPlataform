@@ -6,25 +6,12 @@ import './auth.css'
 // Componente para login y registro con diseño en tonos grises
 // ======================================================
 
-interface AuthError {
-  message: string
-}
-
-interface AuthUser {
-  _id?: string
-  name: string
-  email: string
-  role: string
-}
-
-type AuthMode = 'login' | 'register'
-
 export function LoginRegister() {
-  const [mode, setMode] = useState<AuthMode>('login')
+  const [mode, setMode] = useState('login')
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string>('')
-  const [success, setSuccess] = useState<string>('')
-  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+  const [currentUser, setCurrentUser] = useState(null)
 
   // Form state - Login
   const [loginEmail, setLoginEmail] = useState('')
@@ -35,9 +22,9 @@ export function LoginRegister() {
   const [registerEmail, setRegisterEmail] = useState('')
   const [registerPassword, setRegisterPassword] = useState('')
   const [registerConfirmPassword, setRegisterConfirmPassword] = useState('')
-  const [registerRole, setRegisterRole] = useState<'student' | 'teacher' | 'admin'>('student')
+  const [registerRole, setRegisterRole] = useState('student')
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e) => {
     e.preventDefault()
     setError('')
     setSuccess('')
@@ -67,14 +54,14 @@ export function LoginRegister() {
       } else {
         setError(`❌ ${response.error}`)
       }
-    } catch (err: any) {
+    } catch (err) {
       setError(`❌ Error: ${err.message}`)
     } finally {
       setLoading(false)
     }
   }
 
-  const handleRegister = async (e: React.FormEvent) => {
+  const handleRegister = async (e) => {
     e.preventDefault()
     setError('')
     setSuccess('')
@@ -108,7 +95,7 @@ export function LoginRegister() {
       } else {
         setError(`❌ ${response.error}`)
       }
-    } catch (err: any) {
+    } catch (err) {
       setError(`❌ Error: ${err.message}`)
     } finally {
       setLoading(false)
@@ -123,7 +110,7 @@ export function LoginRegister() {
       setCurrentUser(null)
       setSuccess('Sesión cerrada')
       setTimeout(() => setSuccess(''), 2000)
-    } catch (err: any) {
+    } catch (err) {
       setError(`Error: ${err.message}`)
     }
   }
@@ -283,7 +270,7 @@ export function LoginRegister() {
               <select
                 id="register-role"
                 value={registerRole}
-                onChange={(e) => setRegisterRole(e.target.value as 'student' | 'teacher' | 'admin')}
+                onChange={(e) => setRegisterRole(e.target.value)}
                 disabled={loading}
               >
                 <option value="student">Estudiante</option>
