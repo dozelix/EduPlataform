@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build output
+dist/
+out/
+build/
+release/
+
+# Logs
+*.log
+logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Electron
+electron-builder-effective-config.yaml
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Package locks (decidir en equipo si commitear o no)
+# package-lock.json
+
+# Database
+*.db
+data/
+!data/.gitkeep
+------------
+# Dependencies
+yarn.lock
+
