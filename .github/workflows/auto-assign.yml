@@ -23,13 +23,13 @@ jobs:
 
             let assignee = null;
 
-            // Tareas de auth/login → EchoBit3
+            // Tareas de auth/login → N4C4
             if (labels.includes('auth')) {
-              assignee = 'EchoBit3';
-            }
-            // Diseño complementario / ui-complement → N4C4
-            else if (labels.includes('ui-complement')) {
               assignee = 'N4C4';
+            }
+            // Diseño complementario / ui-complement → EchoBit3
+            else if (labels.includes('ui-complement')) {
+              assignee = 'EchoBit3';
             }
             // Tareas complejas, design-bug, qa, docs-obsolete → dozelix
             else if (
