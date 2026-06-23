@@ -1,0 +1,72 @@
+name: "Design / QA Report"
+description: "Reportar un error de diseño, montaje de componentes o fallo de QA"
+title: "[Design/QA] "
+labels: []
+assignees: []
+body:
+  - type: dropdown
+    id: category
+    attributes:
+      label: "Categoría"
+      options:
+        - "Design Bug — Error visual o de layout"
+        - "Montaje — Componente mal integrado o fuera de lugar"
+        - "QA — Comportamiento incorrecto detectado en testing"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: "Área del proyecto"
+      options:
+        - "Auth / Login / Register"
+        - "Dashboard"
+        - "Sidebar / Topbar"
+        - "CourseCard / StatsGrid"
+        - "Otro"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: "Descripción del problema"
+      placeholder: "¿Qué está mal? ¿Qué debería verse/comportarse diferente?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: "Pasos para reproducir"
+      placeholder: |
+        1. Ir a...
+        2. Hacer clic en...
+        3. Ver el error...
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: "Comportamiento esperado"
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: "Complejidad estimada"
+      options:
+        - "Alta — requiere refactor o coordinación"
+        - "Media — cambio en varios archivos"
+        - "Baja — fix puntual"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: "Checklist previo"
+      options:
+        - label: "Verifiqué que no existe un issue duplicado"
+          required: true
+        - label: "Adjunto screenshot o descripción precisa del problema"
+          required: false
