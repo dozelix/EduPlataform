@@ -37,8 +37,10 @@ electron-builder-effective-config.yaml
 
 # Database
 *.db
-data/
+/data/
 !data/.gitkeep
+# Excluir datos de fuente de la app del ignore
+!packages/frontend/src/data/
 ------------
 # Dependencies
 yarn.lock

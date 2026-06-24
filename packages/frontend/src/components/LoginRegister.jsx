@@ -5,7 +5,7 @@ import React, { useState } from 'react'
 // Componente para login y registro con diseño en tonos grises
 // ======================================================
 
-export function LoginRegister() {
+export function LoginRegister({ onSuccess }) {
   const [mode, setMode] = useState('login')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -47,9 +47,8 @@ export function LoginRegister() {
         setLoginEmail('')
         setLoginPassword('')
         setTimeout(() => {
-          // Aquí puedes redirigir al dashboard o cambiar de vista
-          console.log('Usuario autenticado:', response.data)
-        }, 1500)
+          onSuccess?.(response.data)
+        }, 1200)
       } else {
         setError(`❌ ${response.error}`)
       }

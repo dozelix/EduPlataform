@@ -1,172 +1,89 @@
-# 🔐 Guía: Login & Register para EduPlatform
+# Auth Guide — EduPlatform
 
-## ✅ Lo que hemos creado
-
-### 1. **Backend (Electron Main Process)**
-- ✓ Modelo User actualizado con **hash de contraseñas** (bcryptjs)
-- ✓ Canales IPC: `auth:register`, `auth:login`, `auth:logout`
-- ✓ Validaciones de seguridad:
-  - Validación de email
-  - Contraseña mínimo 6 caracteres
-  - Verificación de emails únicos
-  - Hash de contraseñas antes de guardar
-  - Comparación segura de contraseñas
-
-### 2. **Frontend (React)**
-- ✓ Componente `LoginRegister.tsx` con:
-  - Formulario de Login
-  - Formulario de Registro
-  - Sistema de mensajes de error/éxito
-  - Dashboard simple después de autenticarse
-  - Estilos minimalistas en tonos grises
-- ✓ Archivo CSS con diseño responsivo
-
-### 3. **Tipos Compartidos**
-- ✓ DTOs para login/register
-- ✓ Canales IPC actualizados
+Referencia rápida del sistema de autenticación. La documentación completa está en [README.md](../README.md#5-sistema-de-autenticación).
 
 ---
 
-## 🚀 Instalación de Dependencias
+## Archivos involucrados
 
-### 1. Instalar bcryptjs en el backend
+| Archivo | Rol |
+|---|---|
+| `packages/main/src/db/models/User.js` | Esquema Mongoose con hash bcrypt |
+| `packages/main/src/ipc/userHandlers.js` | Handlers `auth:register`, `auth:login`, `auth:logout` |
+| `packages/main/src/preload.cjs` | Expone `window.api` al renderer |
+| `packages/shared/src/ipc/channels.js` | Constantes de todos los canales |
+| `packages/frontend/src/components/LoginRegister.jsx` | Componente de formulario |
+| `packages/frontend/src/styles/auth.css` | Estilos del formulario |
 
-```bash
-cd /workspaces/EduPlataform/packages/main
-npm install bcryptjs
-npm install -D @types/bcryptjs
+---
+
+## Canales IPC de autenticación
+
+```js
+import { IPC_CHANNELS } from 'packages/shared/src/ipc/channels.js'
+
+// Registro
+window.api.invoke('auth:register', {
+  name: 'Juan Pérez',
+  email: 'juan@ejemplo.com',
+  password: 'minimo6',
+  confirmPassword: 'minimo6',
+  role: 'student'   // 'student' | 'teacher' | 'admin'
+})
+
+// Login
+window.api.invoke('auth:login', {
+  email: 'juan@ejemplo.com',
+  password: 'minimo6'
+})
+
+// Logout
+window.api.invoke('auth:logout')
 ```
 
-### 2. Construir el backend
+Respuesta exitosa: `{ success: true, data: { _id, name, email, role, createdAt } }`
+Respuesta de error: `{ success: false, error: 'mensaje' }`
 
-```bash
-cd /workspaces/EduPlataform/packages/main
-npm run build
+---
+
+## Integración del componente
+
+```jsx
+// app.jsx — modo landing
+<LoginRegister
+  onSuccess={(user) => {
+    setCurrentUser(user)
+    setIsAuthenticated(true)
+  }}
+/>
+
+// app.jsx — modo autenticado (sección usuarios)
+<LoginRegister
+  onSuccess={(user) => setCurrentUser(user)}
+/>
 ```
 
----
-
-## 📝 Integración en App.tsx
-
-Para usar el componente en tu aplicación, actualiza `App.tsx`:
-
-```tsx
-import React, { useState } from 'react'
-import { LoginRegister } from '../features/auth/LoginRegister'
-
-function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-
-  if (!isAuthenticated) {
-    return <LoginRegister />
-  }
-
-  // Tu dashboard principal aquí
-  return (
-    <div>
-      {/* Contenido después de autenticarse */}
-    </div>
-  )
-}
-
-export default App
-```
+El prop `onSuccess` es opcional (`= () => {}`). Si se omite, el componente funciona de forma autónoma mostrando el dashboard del usuario internamente.
 
 ---
 
-## 🎯 Uso del Componente
+## Validaciones aplicadas
 
-### Login
-1. Usuario ingresa email y contraseña
-2. Se valida en el backend
-3. Si es correcto, se muestra el dashboard con sus datos
-4. Botón para cerrar sesión
+**Frontend** (antes de invocar IPC):
+- Campos requeridos no vacíos
+- `password === confirmPassword`
 
-### Registro
-1. Usuario completa: nombre, email, contraseña (x2), rol
-2. Se valida:
-   - Email no duplicado
-   - Contraseñas coinciden
-   - Longitud mínima
-   - Email válido
-3. Se crea el usuario con contraseña hasheada
-4. Redirige a login
-
-### Seguridad Implementada
-- ✓ **Hash de contraseñas**: bcryptjs (salt 10)
-- ✓ **Validación de email**: Regex básico
-- ✓ **Contraseñas no se devuelven**: `select: false` en Mongoose
-- ✓ **Mensajes seguros**: No se especifica si el email existe
-- ✓ **Validación en frontend y backend**
+**Backend** (en el handler IPC):
+- Formato de email con regex
+- Longitud mínima de 6 caracteres
+- Email único en la base de datos
+- Hash con bcrypt (salt 10) antes de guardar
 
 ---
 
-## 📋 Flujo de Autenticación
+## Próximos pasos (pendientes)
 
-```
-Login Form
-    ↓
-window.api.invoke('auth:login', {email, password})
-    ↓
-Backend: Busca usuario por email
-    ↓
-Compara contraseña con bcrypt
-    ↓
-Si OK → Devuelve usuario sin password
-Si ERROR → Devuelve mensaje genérico
-    ↓
-Frontend: Muestra dashboard o error
-```
-
----
-
-## 🎨 Estilos Personalizables
-
-Los estilos están en `src/features/auth/auth.css`. Puedes personalizar:
-
-- Colores del gradiente: `.btn-primary` (línea 165)
-- Espacios: Modificar `gap`, `padding`
-- Fuentes: Cambiar `font-family`
-- Colores de tonos grises: Variables en los selectores
-
----
-
-## ⚠️ Próximos Pasos (Opcionales)
-
-Para producción, considera agregar:
-
-1. **Tokens JWT**: Para mantener sesiones
-2. **Refresh tokens**: Para sesiones de larga duración
-3. **Rate limiting**: Proteger contra ataques de fuerza bruta
-4. **Email verification**: Confirmar email en el registro
-5. **Password reset**: Recuperar contraseña olvidada
-6. **2FA**: Autenticación de dos factores
-
----
-
-## 🐛 Debugging
-
-Si algo no funciona:
-
-1. Revisa la consola del navegador (DevTools)
-2. Revisa la consola de Electron (Main process)
-3. Verifica que MongoDB esté corriendo
-4. Asegúrate de que bcryptjs esté instalado
-
-```bash
-npm list bcryptjs  # en packages/main
-```
-
----
-
-## 📞 Resumen de Cambios
-
-| Archivo | Cambio |
-|---------|--------|
-| `packages/main/src/db/models/User.ts` | Agregado: password + bcryptjs |
-| `packages/main/src/ipc/userHandlers.ts` | Agregado: auth:login, auth:register |
-| `packages/shared/src/ipc/channels.ts` | Agregado: canales de auth |
-| `packages/shared/src/types/user.ts` | Agregado: DTOs de auth |
-| `packages/frontend/src/features/auth/LoginRegister.tsx` | NUEVO: Componente React |
-| `packages/frontend/src/features/auth/auth.css` | NUEVO: Estilos |
-
+1. Whitelist de canales IPC en `preload.cjs` — ver [SECURITY.md](../SECURITY.md)
+2. Implementar `auth:get-current` para persistencia de sesión
+3. Excluir `password` de `user:get-all` — `User.find().select('-password').lean()`
+4. JWT para sesiones de larga duración

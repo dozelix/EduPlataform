@@ -1,0 +1,219 @@
+/* =====================================================
+   landing/base.css — Estilos base, layout y utilidades
+   compartidas entre todos los módulos de la landing.
+   ===================================================== */
+
+/* ── Raíz ──────────────────────────────────────────── */
+.lp {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--lp-bg);
+  color: var(--lp-text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Contenedor ────────────────────────────────────── */
+.lp-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 28px;
+}
+
+/* ── Secciones ─────────────────────────────────────── */
+.lp-section     { padding: 96px 0; }
+.lp-section--alt { background: var(--lp-bg-alt); }
+
+.lp-section__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  color: var(--lp-primary);
+  margin-bottom: 12px;
+}
+
+.lp-section__title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(28px, 3.5vw, 40px);
+  font-weight: 800;
+  color: var(--lp-text);
+  letter-spacing: -0.8px;
+  line-height: 1.15;
+  margin-bottom: 12px;
+}
+
+.lp-section__desc {
+  font-size: 16px;
+  color: var(--lp-text-muted);
+  line-height: 1.65;
+  max-width: 520px;
+}
+
+.lp-section__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 48px;
+  flex-wrap: wrap;
+}
+
+.lp-section__header-text { flex: 1; }
+
+/* ── Botón link ────────────────────────────────────── */
+.lp-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--lp-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 8px 0;
+  white-space: nowrap;
+  transition: gap var(--lp-transition);
+}
+
+.lp-link-btn:hover { gap: 10px; }
+
+/* ── Botones primarios ─────────────────────────────── */
+.lp-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  border-radius: var(--lp-radius-md);
+  font-size: 15px;
+  font-weight: 600;
+  color: white;
+  background: var(--lp-gradient);
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.35);
+  transition: all var(--lp-transition);
+}
+
+.lp-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(37, 99, 235, 0.45);
+}
+
+.lp-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  border-radius: var(--lp-radius-md);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--lp-text);
+  background: var(--lp-surface);
+  border: 1.5px solid var(--lp-border-strong);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--lp-transition);
+}
+
+.lp-btn-ghost:hover {
+  border-color: var(--lp-primary);
+  color: var(--lp-primary);
+  background: var(--lp-primary-lighter);
+}
+
+/* ── Filter chips (reutilizado en Featured y Courses) ── */
+.lp-filter-chip {
+  padding: 7px 18px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1.5px solid var(--lp-border);
+  background: var(--lp-surface);
+  color: var(--lp-text-muted);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--lp-transition);
+}
+
+.lp-filter-chip:hover {
+  border-color: var(--lp-primary);
+  color: var(--lp-primary);
+  background: var(--lp-primary-lighter);
+}
+
+.lp-filter-chip.active {
+  background: var(--lp-primary);
+  border-color: var(--lp-primary);
+  color: white;
+  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.28);
+}
+
+/* ── Meta items (reutilizado en Featured y Courses) ─── */
+.lp-meta-rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--lp-accent);
+}
+
+.lp-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--lp-text-muted);
+}
+
+/* ── Degradado de texto ────────────────────────────── */
+.lp-gradient-text {
+  background: var(--lp-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Animaciones ───────────────────────────────────── */
+@keyframes lp-fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes lp-fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes lp-slideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Responsive base ───────────────────────────────── */
+@media (max-width: 768px) {
+  .lp-section { padding: 64px 0; }
+
+  .lp-section__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .lp-hero__ctas { flex-direction: column; }
+
+  .lp-btn-primary,
+  .lp-btn-ghost {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .lp-container { padding: 0 16px; }
+}

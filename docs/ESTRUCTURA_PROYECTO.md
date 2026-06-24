@@ -1,9 +1,12 @@
-# 📁 Estructura de Proyecto - Monorepo Electron + React + MongoDB Local
+<<<<<<< HEAD
+# 📁 Estructura de Proyecto - EduPlataform Monorepo
 
-## 🎯 Arquitectura General (Monorepo)
+**Monorepo Electron + React + MongoDB**
+
+## 🎯 Arquitectura General
 
 ```text
-proyecto-clinic/
+EduPlataform/
 ├── packages/
 │   ├── main/                   # Backend: Electron main process + Mongoose
 │   │   ├── src/
@@ -71,159 +74,50 @@ proyecto-clinic/
 ├── eslint.config.js            # Auditoría de código para JS y JSX
 ├── prettier.config.js          # Formateador de código JavaScript
 └── .gitignore
+=======
+# Estructura del Proyecto — EduPlatform
 
+Referencia rápida de la arquitectura. La documentación completa está en [README.md](../README.md#3-estructura-de-archivos).
+
+---
+>>>>>>> 2ccd77a0d0270e543d8a916fd4d713d0ee4a6a7e
+
+## Árbol resumido
+
+```
+packages/frontend/src/
+├── main.jsx                → importa ./styles/main.css (único compositor)
+├── app.jsx                 → modo landing (sin auth) / modo autenticado
+├── data/                   → fuente única de datos mock (DRY)
+├── components/             → app autenticado (dark theme, prefijo .db-)
+├── features/
+│   ├── dashboard/          → vista principal autenticada
+│   └── landing/            → landing pública (light theme, prefijo .lp-)
+└── styles/
+    ├── main.css            → compositor de toda la cascada CSS
+    ├── index.css / auth.css / Dashboard.css / app.css
+    └── landing/            → 8 módulos CSS (SRP)
+
+packages/main/src/
+├── index.js                → entrada Electron
+├── preload.cjs             → contextBridge → window.api
+├── db/connection.js        → connectDB / disconnectDB
+├── db/models/User.js       → esquema Mongoose con bcrypt
+└── ipc/userHandlers.js     → handlers auth:* y user:*
+
+packages/shared/src/
+└── ipc/channels.js         → IPC_CHANNELS (constantes compartidas)
 ```
 
 ---
 
-## 🔄 Flujo de Datos en Monorepo
+## Decisiones de diseño clave
 
-```text
-┌─────────────────────────────────────────────────────┐
-│               ELECTRON MAIN PROCESS                 │
-│         (packages/main - Node.js + Mongoose)        │
-│                                                     │
-│   ┌──────────────────────────────────────┐          │
-│   │ IPC Handlers (Canales String)        │          │
-│   │  • userHandlers.js                   │          │
-│   │  • productHandlers.js                │          │
-│   └──────────────────────────────────────┘          │
-│               ↕ (Llamadas directas)                 │
-│   ┌──────────────────────────────────────┐          │
-│   │ Services (Lógica de Negocio)         │          │
-│   │  • userService.js                    │          │
-│   │  • productService.js                 │          │
-│   └──────────────────────────────────────┘          │
-│               ↕ (Consultas/Mutaciones)              │
-│   ┌──────────────────────────────────────┐          │
-│   │ Mongoose Models                      │          │
-│   │  • User, Product, etc.               │          │
-│   └──────────────────────────────────────┘          │
-│               ↕ (Lectura y Escritura)               │
-│   ┌──────────────────────────────────────┐          │
-│   │            MongoDB Local             │          │
-│   └──────────────────────────────────────┘          │
-└─────────────────────────────────────────────────────┘
-                    ↕ (Puente IPC)
-┌─────────────────────────────────────────────────────┐
-│          FRONTEND PROCESS (React + Vite)            │
-│                (packages/frontend)                  │
-│                                                     │
-│   Componentes JSX → Orquestadores de Vista (.jsx)   │
-│         ↓                  ↓                        │
-│   Eventos de Usuario → window.api.invoke()          │
-│         ↓                  ↓                        │
-│   Actualización de UI ← Resoluciones Asíncronas     │
-└─────────────────────────────────────────────────────┐
+**CSS en dos paletas separadas:**
+Los estilos del app autenticado usan variables `--color-*` (dark) y prefijo `.db-`. Los estilos de la landing usan variables `--lp-*` (scoped en `.lp`) y prefijo `.lp-`. Esto evita colisiones de cascada al cambiar entre modos.
 
-packages/shared → Constantes globales y validaciones comunes del ecosistema
+**Datos en `src/data/`:**
+`COURSES` y `STATS` se definían en múltiples archivos. Se centralizaron en `data/courses.js` y `data/stats.js`. Todos los componentes que necesitan estos datos importan desde ahí.
 
-```
-
----
-
-## 🔑 Principios de Diseño
-
-### Separación de Responsabilidades en Monorepo
-
-* **Main Process** (`packages/main`): Acceso a la base de datos a través de Mongoose, procesamiento de payloads pesados, encriptación en backend y lógica de negocio centralizada.
-* **Frontend Process** (`packages/frontend`): Renderizado semántico de interfaces de usuario, encapsulamiento de estilos CSS estructurados e invocación asíncrona de eventos de sistema.
-* **Shared** (`packages/shared`): Centralización de variables constantes del negocio y utilidades funcionales compartidas.
-
-### IPC Bridge Seguro
-
-* La capa web externa no posee acceso directo al backend de Node.js ni a los módulos internos de Electron.
-* El script `preload.js` expone un objeto seguro y controlado (`window.api`) utilizando `contextBridge.exposeInMainWorld`.
-* Las llamadas se ejecutan mediante canales semánticos basados en texto evitando fugas de memoria o vulnerabilidades críticas de ejecución.
-
-### Sin Backend Separado
-
-* No se requiere el despliegue de servidores HTTP o REST externos (como Express o Fastify).
-* El motor de MongoDB se ejecuta localmente en la máquina del cliente como un proceso independiente del sistema operativo.
-* El proceso principal de Electron actúa como el servidor interno monolítico, comunicándose de manera nativa mediante Mongoose.
-
----
-
-## 🏷️ Convenciones de Nomenclatura
-
-* **Componentes de Interfaz**: `PascalCase.jsx` (ej: `Sidebar.jsx`, `CourseCard.jsx`).
-* **Vistas y Controladores**: `PascalCase.jsx` (ej: `Dashboard.jsx`, `LoginRegister.jsx`).
-* **Estilos CSS Relacionados**: `PascalCase.css` (ej: `Dashboard.css`).
-* **Ficheros de Lógica de Backend**: `camelCase.js` (ej: `userHandlers.js`, `connection.js`).
-* **Constantes de Negocio**: `UPPER_SNAKE_CASE.js` (ej: `IPC_CHANNELS.js`).
-* **Modelos de Datos**: `PascalCase.js` (ej: `User.js`, `Product.js`).
-
-### Enrutamiento de Módulos (Alias Nativo)
-
-```javascript
-// ✅ Correcto (Uso de alias limpios configurados en la herramienta de empaquetado)
-import { Sidebar } from '@/components/Sidebar.jsx'
-import { IPC_CHANNELS } from '@shared/constants/channels.js'
-
-// ❌ Evitar (Rutas relativas profundas que degradan la legibilidad)
-import { Sidebar } from '../../../../components/Sidebar.jsx'
-
-```
-
----
-
-## 🔗 Patrón de Comunicación IPC
-
-El flujo asíncronizado de datos entre la UI de React y el núcleo de Electron se rige bajo la estructura nativa de promesas:
-
-```javascript
-// Desde un componente o vista del Frontend (React)
-const cargarUsuarios = async () => {
-  const usuarios = await window.api.invoke('user:get-all')
-  console.log(usuarios)
-}
-
-// Registro del manejador en el Proceso Principal (Electron)
-import { ipcMain } from 'electron'
-import { userService } from '../services/userService.js'
-
-ipcMain.handle('user:get-all', async () => {
-  return await userService.obtenerTodos()
-})
-
-```
-
----
-
-## 🚫 .gitignore Recomendado
-
-```text
-# Dependencias de Node
-node_modules/
-package-lock.json
-
-# Variables de Entorno del Entorno de Desarrollo
-.env
-.env.local
-.env.*.local
-
-# Salidas de Compilación y Empaquetado final
-dist/
-out/
-build/
-
-# Logs del Sistema
-*.log
-logs/
-
-# Configuraciones locales de Editores e IDEs
-.vscode/
-.idea/
-*.swp
-
-# Archivos temporales de Sistemas Operativos
-.DS_Store
-Thumbs.db
-
-# Configuración generada por Electron Builder
-electron-builder-effective-config.yaml
-
-# Almacenamiento local de la Base de Datos (Si se monta en la raíz)
-data/
-
-```
+**`LoginRegister.jsx` con prop `onSuccess`:**
+El componente acepta un callback `onSuccess(user)` que `app.jsx` usa para pasar del modo landing al modo autenticado. Sin el prop, funciona de forma autónoma.

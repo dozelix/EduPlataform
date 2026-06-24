@@ -3,10 +3,6 @@
    Estilos minimalistas para login y registro
    ====================================================== */
 
-* {
-  box-sizing: border-box;
-}
-
 .auth-container {
   min-height: 100vh;
   display: flex;
@@ -127,50 +123,41 @@
   color: #9ca3af;
 }
 
-/* Buttons */
-.btn {
-  padding: 12px 18px;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  letter-spacing: 0.2px;
-}
-
-.btn-primary {
+/* Buttons — scoped a .auth-card para no colisionar con app.css */
+.auth-card .btn-primary {
   background: linear-gradient(135deg, #4b5563 0%, #2c3e50 100%);
   color: #ffffff;
   width: 100%;
   padding: 12px;
   font-size: 15px;
   margin-top: 8px;
+  display: block;
 }
 
-.btn-primary:hover:not(:disabled) {
+.auth-card .btn-primary:hover:not(:disabled) {
   background: linear-gradient(135deg, #3a4452 0%, #1c2e40 100%);
   box-shadow: 0 4px 12px rgba(44, 62, 80, 0.2);
   transform: translateY(-2px);
 }
 
-.btn-primary:active:not(:disabled) {
+.auth-card .btn-primary:active:not(:disabled) {
   transform: translateY(0);
 }
 
-.btn-primary:disabled {
+.auth-card .btn-primary:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.btn-logout {
+.auth-card .btn-logout {
   background: #e5e7eb;
   color: #374151;
   margin-top: 24px;
   width: 100%;
+  display: block;
 }
 
-.btn-logout:hover:not(:disabled) {
+.auth-card .btn-logout:hover:not(:disabled) {
   background: #d1d5db;
 }
 

@@ -1,0 +1,63 @@
+name: "Docs Review / Obsolescencia"
+description: "Marcar documentación desactualizada o proponer modernización"
+title: "[Docs] "
+labels: ["docs-obsolete", "documentation"]
+assignees: []
+body:
+  - type: dropdown
+    id: doc_file
+    attributes:
+      label: "Documento afectado"
+      options:
+        - "docs/AUTH_GUIDE.md"
+        - "docs/ESTRUCTURA_PROYECTO.md"
+        - "docs/GUIA_CODIGO(obsoleta).md"
+        - "docs/IMPLEMENTACION_LOGIN_REGISTER.md"
+        - "docs/REGLAS_COLABORACION.md"
+        - "docs/SETUP_INICIAL.md"
+        - "README.md"
+        - "Otro"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: "Nivel de obsolescencia"
+      options:
+        - "Crítica — información incorrecta que puede causar errores"
+        - "Alta — sección completa desactualizada"
+        - "Media — referencia a versiones/rutas que ya no existen"
+        - "Baja — mejora de redacción o ejemplos"
+    validations:
+      required: true
+
+  - type: textarea
+    id: what_is_wrong
+    attributes:
+      label: "¿Qué está desactualizado?"
+      placeholder: "Describe la sección o contenido que ya no refleja el estado actual del proyecto"
+    validations:
+      required: true
+
+  - type: textarea
+    id: current_state
+    attributes:
+      label: "Estado actual del proyecto (la realidad)"
+      placeholder: "¿Cómo funciona realmente esto hoy?"
+
+  - type: textarea
+    id: proposed_update
+    attributes:
+      label: "Propuesta de actualización"
+      placeholder: "Si tienes idea de cómo debería quedar el doc actualizado"
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: "Checklist"
+      options:
+        - label: "Verifiqué que el doc existe en la ruta indicada"
+          required: true
+        - label: "Comparé con el código actual para confirmar la discrepancia"
+          required: false

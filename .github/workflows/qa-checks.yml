@@ -1,0 +1,57 @@
+name: QA Checks
+
+on:
+  pull_request:
+    branches: [main, master]
+  push:
+    branches: [main, master]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Run tests
+        run: npm test -- --run
+
+      - name: Build check
+        run: npm run build:frontend
+
+  docs-freshness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for stale docs
+        run: |
+          echo "=== Docs modified in last 60 days ==="
+          git log --since="60 days ago" --name-only --pretty=format: -- docs/ | sort -u | grep -v '^$' || echo "(ninguna)"
+
+          echo ""
+          echo "=== Docs NO modificadas en los últimos 90 días ==="
+          find docs/ -name "*.md" | while read f; do
+            last=$(git log -1 --format="%ar" -- "$f")
+            days=$(git log -1 --format="%ct" -- "$f")
+            now=$(date +%s)
+            if [ -n "$days" ]; then
+              diff=$(( (now - days) / 86400 ))
+              if [ $diff -gt 90 ]; then
+                echo "  STALE ($diff días): $f"
+              fi
+            fi
+          done
