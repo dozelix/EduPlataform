@@ -1,2 +1,0 @@
-crear mockup db
-asegurar diseño del dashboard
