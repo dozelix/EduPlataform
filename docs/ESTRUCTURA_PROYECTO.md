@@ -1,9 +1,11 @@
-# 📁 Estructura de Proyecto - Monorepo Electron + React + MongoDB Local
+# 📁 Estructura de Proyecto - EduPlataform Monorepo
 
-## 🎯 Arquitectura General (Monorepo)
+**Monorepo Electron + React + MongoDB**
+
+## 🎯 Arquitectura General
 
 ```text
-proyecto-clinic/
+EduPlataform/
 ├── packages/
 │   ├── main/                   # Backend: Electron main process + Mongoose
 │   │   ├── src/

@@ -23,8 +23,8 @@ git --version
 ## 1️⃣ Clonar el Repositorio
 
 ```bash
-git clone https://github.com/tu-usuario/clinic-pc.git
-cd clinic-pc
+git clone https://github.com/dozelix/EduPlataform.git
+cd EduPlataform
 
 ```
 
@@ -32,13 +32,13 @@ cd clinic-pc
 
 ## 2️⃣ Estructura de Carpetas Base (Monorepo)
 
-Ejecuta el siguiente comando en tu terminal para crear el esqueleto modular del proyecto:
+> ✅ **La estructura ya está creada.** Solo verifica que existan las carpetas:
 
 ```bash
-mkdir -p packages/main/src/{ipc,db/models,services}
-mkdir -p packages/frontend/src/{components/icons,features/dashboard,styles/base,styles/components}
-mkdir -p packages/shared/src/{constants,utils}
-
+# Verificar estructura (ya debe existir)
+ls -la packages/main/src/
+ls -la packages/frontend/src/
+ls -la packages/shared/src/
 ```
 
 ---

@@ -8,10 +8,11 @@
 
 ```
 main                  # Rama de producción protegida (NUNCA escribir código aquí)
-├── feature/* # Nuevas funcionalidades (ej: feature/dashboard-ui)
-├── bugfix/* # Corrección de errores (ej: bugfix/auth-jwt-error)
-├── refactor/* # Optimización de lógica (ej: refactor/db-queries)
-└── docs/* # Cambios en manuales (ej: docs/setup-guide)
+develop              # Rama de desarrollo principal
+├── feature/*        # Nuevas funcionalidades (ej: feature/dashboard-ui)
+├── bugfix/*         # Corrección de errores (ej: bugfix/auth-error)
+├── refactor/*       # Optimización de lógica (ej: refactor/ipc-security)
+└── docs/*           # Cambios en manuales (ej: docs/update-security)
 
 ```
 
