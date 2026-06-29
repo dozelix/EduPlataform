@@ -1,0 +1,10 @@
+/* ==========================================================================
+   tailwind.css — Entrada de Tailwind v4
+   PREFLIGHT DESACTIVADO a propósito durante la migración: importamos solo
+   theme + utilities, NO el reset global (preflight), para que las utilidades
+   de Tailwind convivan con el CSS plano existente sin pisarlo.
+   Cuando todas las vistas estén migradas se reactiva el preflight.
+   ========================================================================== */
+@layer theme, components, utilities;
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
