@@ -1,25 +1,16 @@
 /* ==========================================================================
    main.css — Compositor principal de estilos
-   Importado por: src/main.jsx
+   Importado por: src/main.jsx (despues de tailwind.css)
+   Todo el CSS plano heredado va en la capa `legacy` (ver tailwind.css):
+   queda por encima del preflight (no lo pisa el reset) y por debajo de las
+   utilidades de Tailwind (las vistas tipo Udemy ganan).
    ========================================================================== */
 
-/* 1. Tokens globales, reset, tipografía, fuentes */
-@import './index.css';
+/* Tokens globales, reset, tipografía, fuentes */
+@import './index.css' layer(legacy);
 
-/* 2. Componentes de la app autenticada */
-@import './auth.css';
-@import './Dashboard.css';
-@import './Catalog.css';
-@import './MyLearning.css';
-@import './Lesson.css';
-@import './app.css';
-
-/* 3. Landing page — módulos independientes */
-@import './landing/variables.css';
-@import './landing/base.css';
-@import './landing/navbar.css';
-@import './landing/hero.css';
-@import './landing/featured.css';
-@import './landing/courses.css';
-@import './landing/footer.css';
-@import './landing/modal.css';
+/* Componentes de la app autenticada (tema claro tipo Udemy) */
+@import './Dashboard.css' layer(legacy);
+@import './Catalog.css' layer(legacy);
+@import './MyLearning.css' layer(legacy);
+@import './Lesson.css' layer(legacy);

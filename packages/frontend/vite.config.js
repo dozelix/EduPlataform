@@ -17,6 +17,10 @@ export default defineConfig({
     }
   },
   server: {
-    port: 5173
+    port: 5173,
+    // Electron (packages/main/src/index.js) carga http://localhost:5173 fijo.
+    // strictPort evita que Vite caiga en otro puerto y Electron termine
+    // cargando un servidor distinto/zombie.
+    strictPort: true
   }
 })
