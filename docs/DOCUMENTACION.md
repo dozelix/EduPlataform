@@ -2,6 +2,11 @@
 
 Guía centralizada de la documentación del proyecto. Solo se listan archivos que existen.
 
+> Empieza por [FUENTE_DE_VERDAD.md](FUENTE_DE_VERDAD.md). Es el documento autoritativo (para
+> humanos y para IA): embebe la pauta real del caso (modelo relacional a transformar a NoSQL,
+> volumen requerido) y lista las afirmaciones equivocadas de los docs internos. El resto de la
+> documentación interna es útil pero tiene errores; no la sigas a ciegas.
+
 ---
 
 ## Por dónde empezar
@@ -18,7 +23,7 @@ Guía centralizada de la documentación del proyecto. Solo se listan archivos qu
 1. [../SECURITY.md](../SECURITY.md) — política y vulnerabilidades conocidas
 
 **Necesito revisar problemas conocidos**
-1. [../informe QA.md](../informe%20QA.md) — bugs y malas prácticas
+1. [AUDITORIA.md](AUDITORIA.md) — hallazgos verificados (seguridad, funcional, docs)
 
 ---
 
@@ -32,23 +37,28 @@ Guía centralizada de la documentación del proyecto. Solo se listan archivos qu
 | [REGLAS_COLABORACION.md](REGLAS_COLABORACION.md) | Git workflow, commits, PRs, CI |
 | [../README.md](../README.md) | Visión general del proyecto |
 | [../SECURITY.md](../SECURITY.md) | Política de seguridad y vulnerabilidades |
-| [../informe QA.md](../informe%20QA.md) | Problemas conocidos y deuda técnica |
-| [../TAREAS.md](../TAREAS.md) | Backlog de tareas del equipo |
+| [FUENTE_DE_VERDAD.md](FUENTE_DE_VERDAD.md) | Doc autoritativo: pauta real y errores de docs internos |
+| [AUDITORIA.md](AUDITORIA.md) | Hallazgos verificados (seguridad, funcional, docs) |
+| [MODELO_NOSQL.md](MODELO_NOSQL.md) | Modelo documental (transform relacional a NoSQL) y seed de volumen |
 
 ---
 
-## Material del caso (fuente de verdad del requerimiento)
+## Material del caso
 
-El enunciado y los datos del ejercicio están en `docs/EduPlatform/`:
+Resumen autoritativo y embebido en [FUENTE_DE_VERDAD.md](FUENTE_DE_VERDAD.md) (léelo primero).
 
-| Archivo | Qué es |
+La pauta oficial completa vive en `Documentacion docente/` (versionada como base del equipo; el
+`.docx` de requisitos queda fuera por ser duplicado del PDF):
+
+| Archivo (en `Documentacion docente/`) | Qué es |
 |---|---|
-| `CASO_3_EduPlatform_Requerimientos_Frontend.pdf` | Requerimientos: 4 vistas (Login, Catálogo, Mi Aprendizaje, Lección) + conversor de monedas |
-| `playground-1.mongodb.js` | Playground de MongoDB |
+| `CASO_3_EduPlatform_schema.sql` | Modelo RELACIONAL de origen, a transformar a NoSQL. Guía real de la BD. |
+| `CASO_3_EduPlatform_mongodb_existente.js` | Mongo actual, mínimo y roto a propósito (huérfanos intencionales) |
+| `CASO_3_EduPlatform_Requerimientos_Frontend.pdf` | Requisitos SOLO de frontend (4 vistas + conversor). Correcto pero parcial: no cubre la BD. |
 
-> Importante: ante cualquier discrepancia entre la documentación interna y el material del
-> caso, manda el material del caso. Los datos de prueba reales (con problemas de integridad
-> intencionales: instructor/curso/lección huérfanos) están en el seed `CASO_3_EduPlatform_mongodb_existente.js`.
+> Importante: ante cualquier discrepancia, manda el código y la BD real, luego el material del
+> caso, y por último los docs internos. El PDF cubre solo frontend; para la BD la guía es
+> `schema.sql` + el issue #22 (volumen 100/999/99). Ver [FUENTE_DE_VERDAD.md](FUENTE_DE_VERDAD.md).
 
 ---
 
@@ -59,15 +69,15 @@ EduPlataform/
 ├─ Documentación
 │  ├─ README.md ........................ Visión general
 │  ├─ SECURITY.md ..................... Seguridad
-│  ├─ informe QA.md ................... Problemas conocidos
-│  ├─ TAREAS.md ....................... Backlog
+│  ├─ Documentacion docente/ ......... Pauta oficial del caso (schema.sql, mongodb_existente.js, PDF)
 │  └─ docs/
 │     ├─ DOCUMENTACION.md ............. Este archivo (índice)
+│     ├─ FUENTE_DE_VERDAD.md .......... Doc autoritativo (pauta real + errores de docs internos)
+│     ├─ AUDITORIA.md ................. Hallazgos verificados (seguridad, funcional, docs)
 │     ├─ SETUP_INICIAL.md ............. Instalación
 │     ├─ ESTRUCTURA_PROYECTO.md ....... Estructura
 │     ├─ AUTH_GUIDE.md ................ Autenticación
-│     ├─ REGLAS_COLABORACION.md ....... Normas de equipo
-│     └─ EduPlatform/ ................. Material del Caso 3
+│     └─ REGLAS_COLABORACION.md ....... Normas de equipo
 ├─ Código
 │  ├─ packages/frontend/ ............. UI React
 │  ├─ packages/main/ ................. Electron IPC (pseudo-backend)

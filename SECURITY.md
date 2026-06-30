@@ -29,7 +29,7 @@ El preload expone exclusivamente `window.api.invoke` y `window.api.on` mediante
 ## Problemas de seguridad conocidos
 
 Identificados en la revisión de QA, pendientes de corrección. Se listan para transparencia
-del equipo. Detalle completo en [informe QA.md](informe%20QA.md).
+del equipo. Detalle completo en [docs/AUDITORIA.md](docs/AUDITORIA.md).
 
 ### CRÍTICO — Sin whitelist de canales IPC
 

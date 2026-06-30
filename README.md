@@ -72,7 +72,8 @@ EduPlataform/
 │   └── shared/                   # Código compartido
 │       └── ipc/                  # Definición de canales (channels.js)
 ├── seeds/                        # Seed del Caso 3 (eduplatform.seed.js)
-├── docs/                         # Documentación + material del caso (docs/EduPlatform)
+├── Documentacion docente/        # Pauta oficial del caso (schema.sql, mongodb_existente.js, PDF)
+├── docs/                         # Documentación interna (ver docs/FUENTE_DE_VERDAD.md)
 ├── package.json                  # Root workspace
 ├── README.md                     # Este archivo
 └── SECURITY.md                   # Política de seguridad
@@ -177,17 +178,19 @@ Toda la documentación centralizada está en el directorio [docs/](docs/):
 
 | Documento | Propósito |
 |-----------|-----------|
+| [FUENTE_DE_VERDAD.md](docs/FUENTE_DE_VERDAD.md) | Empieza aquí. Pauta real (relacional a NoSQL, volumen) y errores de los docs internos |
+| [MODELO_NOSQL.md](docs/MODELO_NOSQL.md) | Modelo documental y seed de volumen (100 cursos / 999 estudiantes / 99 profesores) |
 | [SETUP_INICIAL.md](docs/SETUP_INICIAL.md) | Guía de instalación y configuración inicial |
 | [ESTRUCTURA_PROYECTO.md](docs/ESTRUCTURA_PROYECTO.md) | Descripción detallada de estructura y convenciones |
 | [AUTH_GUIDE.md](docs/AUTH_GUIDE.md) | Sistema de autenticación y login/register |
 | [DOCUMENTACION.md](docs/DOCUMENTACION.md) | Índice central de la documentación |
 | [REGLAS_COLABORACION.md](docs/REGLAS_COLABORACION.md) | Normas para contribuciones y código |
 | [SECURITY.md](SECURITY.md) | Política de seguridad y vulnerabilidades |
-| [TAREAS.md](TAREAS.md) | Backlog de tareas del equipo |
+| [AUDITORIA.md](docs/AUDITORIA.md) | Auditoría: hallazgos verificados (seguridad, funcional, docs) |
 
 ### Resumen de Problemas Conocidos
 
-Revisar [informe QA.md](informe%20QA.md) para lista de:
+Revisar [docs/AUDITORIA.md](docs/AUDITORIA.md) para lista de:
 - ❌ Problemas críticos (seguridad IPC)
 - ⚠️ Problemas de diseño (CSS duplicado, colisiones)
 - 🔧 Áreas en construcción

@@ -65,6 +65,14 @@ mongosh "mongodb://localhost:27017" < seeds/eduplatform.seed.js
 El seed crea las colecciones del caso (`usuarios`, `cursos`, `lecciones`, `inscripciones`,
 `comentarios`) con sus inconsistencias intencionales y la contraseña de desarrollo `edu12345`.
 
+Para el dataset de volumen del issue #22 (100 cursos, 999 estudiantes, 99 profesores + 2 usuarios
+de testeo), usar el seed de volumen (idempotente). Detalle del modelo en
+[MODELO_NOSQL.md](MODELO_NOSQL.md):
+
+```bash
+mongosh "mongodb://localhost:27017" < seeds/eduplatform.volume.seed.js
+```
+
 ---
 
 ## 5. Puntos de entrada (referencia)
@@ -95,13 +103,14 @@ function createWindow() {
 
 app.on('ready', async () => {
   await connectDB()
-  // registrar handlers IPC antes de abrir la ventana
+  createWindow()
   await import('./ipc/authHandlers.js')
   await import('./ipc/courseHandlers.js')
   await import('./ipc/learningHandlers.js')
   await import('./ipc/lessonHandlers.js')
-  createWindow()
 })
+// Nota: el codigo real registra los handlers DESPUES de createWindow; hay una
+// race condition conocida (ver docs/AUDITORIA.md). Lo ideal es registrarlos antes.
 ```
 
 ### `packages/main/src/preload.cjs`
