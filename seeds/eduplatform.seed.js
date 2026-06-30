@@ -1,5 +1,5 @@
 // CASO 3: EduPlatform - BD MongoDB EXISTENTE
-use eduplatform;
+use('eduplatform')
 
 // password (bcrypt) agregada para la opción C de auth. Contraseña de desarrollo: "edu12345".
 const PASS = "$2a$10$u5bCbkxGWzJlxymEoyt7BeX/TDTQON7pcQkK7.a52hJ58N/y8cmo6";

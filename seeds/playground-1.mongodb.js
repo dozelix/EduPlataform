@@ -1,11 +1,13 @@
-// Seed de volumen del Caso 3 (issue #22): 100 cursos, 999 estudiantes, 99 profesores
-// + 1 profesor de testeo y 1 alumno de testeo. Transformacion del modelo relacional
-// (Documentacion docente/CASO_3_EduPlatform_schema.sql) a un modelo documental por referencia.
-// Decisiones de modelado en docs/MODELO_NOSQL.md.
-//
-// Idempotente: limpia las colecciones antes de sembrar.
-// Cargar con:  mongosh "mongodb://localhost:27017" < seeds/eduplatform.volume.seed.js
-
+/* global use, db */
+// MongoDB Playground
+// To disable this template go to Settings | MongoDB | Use Default Template For Playground.
+// Make sure you are connected to enable completions and to be able to run a playground.
+// Use Ctrl+Space inside a snippet or a string literal to trigger completions.
+// The result of the last command run in a playground is shown on the results panel.
+// By default the first 20 documents will be returned with a cursor.
+// Use 'console.log()' to print to the debug output.
+// For more documentation on playgrounds please refer to
+// https://www.mongodb.com/docs/mongodb-vscode/playgrounds/
 const database = 'eduplataform';
 
 // Create a new database.
