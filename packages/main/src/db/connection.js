@@ -2,7 +2,7 @@ import mongoose from 'mongoose'
 
 export async function connectDB() {
   try {
-    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/clinic-pc'
+    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/eduplatform'
 
     await mongoose.connect(mongoUri)
     console.log('✅ MongoDB conectado')

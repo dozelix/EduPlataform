@@ -26,4 +26,15 @@ module.exports = [
       ],
     },
   },
+  {
+    // Preload de Electron: CommonJS (require), por eso usa extensión .cjs.
+    files: ['packages/*/src/**/*.cjs'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      sourceType: 'commonjs',
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
 ];

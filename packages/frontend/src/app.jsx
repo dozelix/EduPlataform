@@ -2,34 +2,32 @@ import React, { useState, useEffect } from 'react'
 
 import Sidebar from './components/Sidebar'
 import Topbar from './components/Topbar'
-import TechStack from './components/Techstack'
-import StatsGrid from './components/StatsGrid'
-import Checklist from './components/Checklist'
-import DbTester from './components/DBTester'
-import Dashboard from './features/dashboard/dashboard'
+import Catalog from './features/courses/Catalog'
+import MyLearning from './features/learning/MyLearning'
+import Lesson from './features/lesson/Lesson'
 import { LoginRegister } from './components/LoginRegister'
-import Landing from './features/landing/Landing'
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [currentUser, setCurrentUser] = useState(null)
 
-  // Authenticated app state
   const [dbStatus, setDbStatus] = useState('idle')
-  const [result, setResult] = useState('')
-  const [activeNav, setActiveNav] = useState('dashboard')
+  const [activeNav, setActiveNav] = useState('courses')
+  const [activeLeccionId, setActiveLeccionId] = useState(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [isElectron] = useState(() => typeof globalThis.window !== 'undefined' && !!globalThis.window.api)
+  const [isElectron] = useState(
+    () => typeof globalThis.window !== 'undefined' && !!globalThis.window.api
+  )
 
   useEffect(() => {
     if (isElectron) setDbStatus('connected')
   }, [isElectron])
 
-  // ── Landing page (unauthenticated) ──────────────────
+  // ── Login (unauthenticated) ─────────────────────────
   if (!isAuthenticated) {
     return (
-      <Landing
-        onLoginSuccess={(user) => {
+      <LoginRegister
+        onSuccess={(user) => {
           setCurrentUser(user)
           setIsAuthenticated(true)
         }}
@@ -40,8 +38,8 @@ function App() {
   // ── Authenticated app ───────────────────────────────
   const appUser = currentUser
     ? {
-        name: currentUser.name,
-        initials: currentUser.name
+        name: currentUser.nombre,
+        initials: currentUser.nombre
           .split(' ')
           .map((w) => w[0])
           .join('')
@@ -57,34 +55,29 @@ function App() {
 
   const renderContent = () => {
     switch (activeNav) {
-      case 'dashboard':
-        return <Dashboard />
-      case 'users':
+      case 'courses':
+        return <Catalog user={currentUser} />
+      case 'learning':
         return (
-          <LoginRegister
-            onSuccess={(user) => setCurrentUser(user)}
+          <MyLearning
+            user={currentUser}
+            onContinue={(leccionId) => {
+              setActiveLeccionId(leccionId)
+              setActiveNav('lesson')
+            }}
+          />
+        )
+      case 'lesson':
+        return (
+          <Lesson
+            leccionId={activeLeccionId}
+            user={currentUser}
+            onNavigate={(leccionId) => setActiveLeccionId(leccionId)}
+            onBack={() => setActiveNav('learning')}
           />
         )
       default:
-        return (
-          <div className="dashboard">
-            <header className="dashboard__header">
-              <p className="dashboard__greeting">EduPlatform</p>
-              <h1 className="dashboard__title">Sección: {activeNav.toUpperCase()}</h1>
-            </header>
-            <TechStack />
-            <br />
-            <StatsGrid />
-            <Checklist />
-            <DbTester
-              isElectron={isElectron}
-              dbStatus={dbStatus}
-              setDbStatus={setDbStatus}
-              result={result}
-              setResult={setResult}
-            />
-          </div>
-        )
+        return null
     }
   }
 

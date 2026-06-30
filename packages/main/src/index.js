@@ -47,7 +47,10 @@ app.on('ready', async () => {
   createWindow()
 
   // Carga dinámica de handlers IPC nativos
-  await import('./ipc/userHandlers.js')
+  await import('./ipc/authHandlers.js')
+  await import('./ipc/courseHandlers.js')
+  await import('./ipc/learningHandlers.js')
+  await import('./ipc/lessonHandlers.js')
 })
 
 app.on('window-all-closed', async () => {

@@ -1,0 +1,185 @@
+/* ==========================================================================
+   Lesson.css — Vista Lección (app autenticada, dark theme)
+   Prefijo: .les-
+   ========================================================================== */
+
+.les-msg {
+  color: var(--color-text-muted);
+  padding: 16px 0;
+}
+
+.les-msg--error {
+  color: var(--color-danger);
+}
+
+.les-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .les-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.les-player {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.les-video {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.les-video video {
+  width: 100%;
+  display: block;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+
+.les-video__src {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  word-break: break-all;
+}
+
+.les-video--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 16 / 9;
+  color: var(--color-text-muted);
+}
+
+.les-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.les-content {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+
+.les-content__title {
+  font-size: 15px;
+  margin-bottom: 8px;
+}
+
+.les-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.les-btn {
+  height: 38px;
+  padding: 0 16px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--gradient-brand);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity var(--transition);
+}
+
+.les-btn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.les-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.les-btn--ghost {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+}
+
+.les-comments {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+
+.les-comments__title {
+  font-size: 15px;
+  margin-bottom: 12px;
+}
+
+.les-comment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.les-comment-input {
+  padding: 10px 12px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  resize: vertical;
+}
+
+.les-comment-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.les-comment-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.les-comment {
+  border-top: 1px solid var(--color-border);
+  padding-top: 12px;
+}
+
+.les-comment__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+
+.les-comment__author {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.les-comment__date {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.les-comment__text {
+  font-size: 14px;
+  color: var(--color-text);
+}

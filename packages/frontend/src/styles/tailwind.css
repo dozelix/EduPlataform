@@ -1,0 +1,13 @@
+/* ==========================================================================
+   tailwind.css — Entrada de Tailwind v4 (preflight ACTIVO)
+   Orden de capas explicito:
+     base (preflight)  <  legacy (CSS plano heredado)  <  utilities
+   - legacy va por encima de base: el reset de Tailwind NO pisa los componentes
+     viejos (.db-*, .lp-*, auth, etc.).
+   - utilities va por encima de legacy: las clases de Tailwind ganan sobre las
+     reglas globales del CSS viejo (p. ej. el color de h1..h6 del tema oscuro),
+     asi las vistas nuevas tipo Udemy se ven correctas.
+   El CSS heredado se importa dentro de la capa `legacy` desde main.css.
+   ========================================================================== */
+@layer theme, base, legacy, components, utilities;
+@import 'tailwindcss';

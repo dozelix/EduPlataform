@@ -15,9 +15,9 @@
     "build": "npm run build:main && npm run build:frontend",
     "electron": "cross-env NODE_ENV=production electron packages/main/src/index.js",
     "electron:dev": "concurrently \"npm run dev:frontend\" \"wait-on http://localhost:5173 && cross-env NODE_ENV=development electron packages/main/src/index.js\"",
-    "lint": "eslint \"packages/*/src/**/*.{js,jsx}\"",
+    "lint": "eslint \"packages/*/src/**/*.{js,cjs,jsx}\"",
     "eslint": "npm run lint",
-    "format": "prettier --write \"packages/*/src/**/*.{js,jsx,json,css}\"",
+    "format": "prettier --write \"packages/*/src/**/*.{js,cjs,jsx,json,css}\"",
     "test": "vitest",
     "predeploy": "vite build --config packages/frontend/vite.config.js --outDir ../../dist-gh",
     "deploy": "gh-pages -d dist-gh"

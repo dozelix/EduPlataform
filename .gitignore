@@ -29,6 +29,16 @@ Thumbs.db
 # Electron
 electron-builder-effective-config.yaml
 
+# Claude Code
+claude.md
+
+# Backlog interno (no lo ve el resto del equipo)
+TAREAS.md
+
+# Word / informes
+*.docx
+~$*.docx
+
 # TypeScript cache
 *.tsbuildinfo
 

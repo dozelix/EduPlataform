@@ -3,19 +3,13 @@ import {
   IconGraduationCap,
   IconClose,
   IconLogOut,
-  IconGrid,
-  IconUsers,
   IconBook,
   IconBarChart,
-  IconSettings,
 } from './icons/Icons'
 
 const NAV_ITEMS = [
-  { id: 'dashboard', icon: <IconGrid />, label: 'Dashboard' },
-  { id: 'users', icon: <IconUsers />, label: 'Usuarios / Auth' },
-  { id: 'courses', icon: <IconBook />, label: 'Cursos' },
-  { id: 'grades', icon: <IconBarChart />, label: 'Calificaciones' },
-  { id: 'settings', icon: <IconSettings />, label: 'Configuración' },
+  { id: 'courses', icon: <IconBook />, label: 'Catálogo' },
+  { id: 'learning', icon: <IconBarChart />, label: 'Mi Aprendizaje' },
 ]
 
 export default function Sidebar({ activeNav, sidebarOpen, setSidebarOpen, handleNav, dbStatus }) {

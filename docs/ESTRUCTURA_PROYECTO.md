@@ -1,123 +1,71 @@
-<<<<<<< HEAD
-# 📁 Estructura de Proyecto - EduPlataform Monorepo
+# Estructura del Proyecto — EduPlataform (Caso 3)
 
-**Monorepo Electron + React + MongoDB**
-
-## 🎯 Arquitectura General
-
-```text
-EduPlataform/
-├── packages/
-│   ├── main/                   # Backend: Electron main process + Mongoose
-│   │   ├── src/
-│   │   │   ├── index.js        # Punto de entrada de la aplicación
-│   │   │   ├── preload.js      # IPC bridge seguro
-│   │   │   ├── ipc/            # IPC handlers nativos
-│   │   │   │   ├── userHandlers.js
-│   │   │   │   ├── productHandlers.js
-│   │   │   │   └── ...
-│   │   │   ├── db/             # Configuración de Mongoose
-│   │   │   │   ├── models/
-│   │   │   │   │   ├── User.js
-│   │   │   │   │   ├── Product.js
-│   │   │   │   │   └── ...
-│   │   │   │   ├── migrations/
-│   │   │   │   ├── seeds/
-│   │   │   │   └── connection.js
-│   │   │   └── services/       # Lógica de negocio (Servicios)
-│   │   │       ├── userService.js
-│   │   │       ├── productService.js
-│   │   │       └── ...
-│   │   └── package.json
-│   │
-│   ├── frontend/               # Frontend: React + Vite
-│   │   ├── src/
-│   │   │   ├── components/     # Componentes atómicos estructurados por SRP
-│   │   │   │   ├── icons/
-│   │   │   │   │   └── Icons.jsx   # Colección unificada de SVGs
-│   │   │   │   ├── Sidebar.jsx     # Navegación lateral
-│   │   │   │   ├── Topbar.jsx      # Barra superior dinámica
-│   │   │   │   └── ...
-│   │   │   ├── features/       # Módulos basados en vistas de la aplicación
-│   │   │   │   ├── dashboard/
-│   │   │   │   │   └── Dashboard.jsx
-│   │   │   │   ├── auth/
-│   │   │   │   │   └── LoginRegister.jsx
-│   │   │   │   └── ...
-│   │   │   ├── styles/         # Arquitectura modular de diseño en CSS
-│   │   │   │   ├── base/
-│   │   │   │   │   ├── reset.css
-│   │   │   │   │   └── variables.css
-│   │   │   │   ├── components/
-│   │   │   │   │   └── Dashboard.css
-│   │   │   │   └── styles.css  # Importador central de estilos
-│   │   │   └── App.jsx         # Punto de entrada e inicio de React
-│   │   ├── public/             # Assets estáticos
-│   │   ├── index.html          # Punto de montaje de la aplicación web
-│   │   ├── vite.config.js      # Configuración de Vite nativa
-│   │   └── package.json
-│   │
-│   └── shared/                 # Código común e independiente entre paquetes
-│       ├── src/
-│       │   ├── constants/      # Constantes globales (Canales IPC, Roles)
-│       │   └── utils/          # Validaciones y utilidades compartidas
-│       └── package.json
-│
-├── docs/                       # Documentación del proyecto
-│   ├── ARQUITECTURA.md
-│   ├── IPC_API.md
-│   └── WORKFLOW.md
-├── .github/
-│   └── PULL_REQUEST_TEMPLATE.md
-├── package.json                # Root package.json (npm workspaces)
-├── package-lock.json           # Lockfile de dependencias unificado
-├── eslint.config.js            # Auditoría de código para JS y JSX
-├── prettier.config.js          # Formateador de código JavaScript
-└── .gitignore
-=======
-# Estructura del Proyecto — EduPlatform
-
-Referencia rápida de la arquitectura. La documentación completa está en [README.md](../README.md#3-estructura-de-archivos).
+Monorepo Electron + React + MongoDB. El frontend implementa las 4 vistas del Caso 3 con un
+tema claro tipo Udemy (Tailwind), leyendo de la base `eduplatform` vía IPC.
 
 ---
->>>>>>> 2ccd77a0d0270e543d8a916fd4d713d0ee4a6a7e
 
-## Árbol resumido
+## Árbol vivo
 
 ```
 packages/frontend/src/
-├── main.jsx                → importa ./styles/main.css (único compositor)
-├── app.jsx                 → modo landing (sin auth) / modo autenticado
-├── data/                   → fuente única de datos mock (DRY)
-├── components/             → app autenticado (dark theme, prefijo .db-)
+├── main.jsx                → importa tailwind.css y main.css; monta <App>
+├── app.jsx                 → login (sin auth) / shell autenticado (nav por estado)
+├── components/
+│   ├── LoginRegister.jsx   → Vista 1, diseño Udemy (Tailwind), auth:login/register
+│   ├── Sidebar.jsx         → nav: Catálogo / Mi Aprendizaje
+│   ├── Topbar.jsx          → barra superior
+│   └── icons/Icons.jsx     → SVGs del shell
 ├── features/
-│   ├── dashboard/          → vista principal autenticada
-│   └── landing/            → landing pública (light theme, prefijo .lp-)
+│   ├── courses/Catalog.jsx     → Vista 2 (curso:listar, filtro, búsqueda, inscribirse, monedas)
+│   ├── learning/MyLearning.jsx → Vista 3 (aprendizaje:listar)
+│   └── lesson/Lesson.jsx       → Vista 4 (leccion:* + comentario:*)
 └── styles/
-    ├── main.css            → compositor de toda la cascada CSS
-    ├── index.css / auth.css / Dashboard.css / app.css
-    └── landing/            → 8 módulos CSS (SRP)
+    ├── tailwind.css        → entrada Tailwind v4 + orden de capas
+    ├── index.css           → tokens --color-* (tema claro), reset, tipografía Inter
+    ├── main.css            → compositor del CSS heredado (capa legacy)
+    └── Dashboard/Catalog/MyLearning/Lesson.css → estilos por área
 
 packages/main/src/
-├── index.js                → entrada Electron
+├── index.js                → entrada Electron (connectDB + carga handlers + ventana)
 ├── preload.cjs             → contextBridge → window.api
-├── db/connection.js        → connectDB / disconnectDB
-├── db/models/User.js       → esquema Mongoose con bcrypt
-└── ipc/userHandlers.js     → handlers auth:* y user:*
+├── db/connection.js        → conecta a mongodb://localhost:27017/eduplatform
+├── db/models/Usuario.js    → esquema de la colección `usuarios` (bcrypt)
+└── ipc/
+    ├── authHandlers.js     → auth:login / auth:register / auth:logout
+    ├── courseHandlers.js   → curso:listar
+    ├── learningHandlers.js → aprendizaje:listar / inscripcion:crear
+    └── lessonHandlers.js   → leccion:obtener / leccion:completar / comentario:listar / comentario:crear
 
 packages/shared/src/
-└── ipc/channels.js         → IPC_CHANNELS (constantes compartidas)
+└── ipc/channels.js         → IPC_CHANNELS (solo canales con handler real)
+
+seeds/eduplatform.seed.js   → datos del Caso 3 (con huérfanos intencionales y contraseña dev)
 ```
 
 ---
 
 ## Decisiones de diseño clave
 
-**CSS en dos paletas separadas:**
-Los estilos del app autenticado usan variables `--color-*` (dark) y prefijo `.db-`. Los estilos de la landing usan variables `--lp-*` (scoped en `.lp`) y prefijo `.lp-`. Esto evita colisiones de cascada al cambiar entre modos.
+**Tema claro tipo Udemy.**
+Paleta primario `#3b1c8c`, acento `#a435f0`, fondo `#f7f9fa`, texto `#1c1d1f`, borde `#d1d7dc`,
+fuente Inter. El tema global vive en los tokens `--color-*` de `index.css`; las vistas nuevas usan
+clases de Tailwind con esos colores.
 
-**Datos en `src/data/`:**
-`COURSES` y `STATS` se definían en múltiples archivos. Se centralizaron en `data/courses.js` y `data/stats.js`. Todos los componentes que necesitan estos datos importan desde ahí.
+**Tailwind + CSS heredado conviviendo (capas).**
+`tailwind.css` declara `@layer theme, base, legacy, components, utilities`. El CSS plano se importa
+en la capa `legacy`: queda por encima del preflight (no lo pisa el reset) y por debajo de las
+utilidades (las clases de Tailwind ganan en las vistas nuevas). El preflight está **activo**.
 
-**`LoginRegister.jsx` con prop `onSuccess`:**
-El componente acepta un callback `onSuccess(user)` que `app.jsx` usa para pasar del modo landing al modo autenticado. Sin el prop, funciona de forma autónoma.
+**Modelo único de usuarios.**
+La autenticación usa `Usuario` → colección `usuarios` del seed (campos en español: `nombre`,
+`email`, `tipo`, `password`). No existe el viejo `User`/`users`.
+
+**Lectura de datos null-safe.**
+El seed trae inconsistencias a propósito (instructor/curso/lección huérfanos). Los handlers
+resuelven los joins de forma defensiva ("Instructor desconocido", "Curso no disponible") para que
+la UI no se rompa.
+
+**Navegación por estado (sin router).**
+`app.jsx` maneja la vista activa con `useState` (`activeNav`, `activeLeccionId`); no se usa
+react-router.
