@@ -1,20 +1,38 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import { Search, Star } from 'lucide-react'
 
-// Vista 2 del Caso 3: Catálogo de Cursos.
-// Lee los cursos reales desde Mongo vía IPC (curso:listar), permite buscar por
-// nombre y filtrar por instructor. El handler resuelve el instructor null-safe,
-// así que los cursos con instructor huérfano llegan como "Instructor desconocido".
-// Incluye inscripción (inscripcion:crear) y conversión de precio a varias monedas
-// usando una API pública de tipos de cambio.
+// Vista 2 del Caso 3: Catalogo de Cursos.
+// Lee los cursos reales desde Mongo via IPC (curso:listar), permite buscar por
+// nombre y filtrar por instructor. El handler resuelve el instructor null-safe.
+// Incluye inscripcion (inscripcion:crear) y conversion de precio a varias monedas
+// usando una API publica de tipos de cambio. Diseno tipo Udemy, marcado semantico.
 
 const MONEDAS = ['USD', 'EUR', 'CLP', 'MXN', 'GBP', 'BRL']
 
+// Convierte el precio en USD a la moneda elegida con las tasas de la API publica.
 function formatearPrecio(precioUSD, moneda, tasas) {
   if (precioUSD == null) return 'Sin precio'
   const tasa = moneda === 'USD' ? 1 : tasas[moneda]
   if (!tasa) return `${precioUSD.toFixed(2)} USD`
   const convertido = precioUSD * tasa
   return convertido.toLocaleString('es-CL', { style: 'currency', currency: moneda })
+}
+
+// Estrellas de calificacion (0-5) con lucide; las llenas se pintan, el resto en gris.
+function Estrellas({ valor }) {
+  const llenas = Math.round(valor)
+  return (
+    <span className="cat-card__stars" aria-hidden="true">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <Star
+          key={i}
+          size={13}
+          className={i <= llenas ? 'is-on' : 'is-off'}
+          fill={i <= llenas ? 'currentColor' : 'none'}
+        />
+      ))}
+    </span>
+  )
 }
 
 export default function Catalog({ user }) {
@@ -51,7 +69,6 @@ export default function Catalog({ user }) {
     cargar()
   }, [user])
 
-  // Tipos de cambio (base USD) desde una API pública sin clave.
   useEffect(() => {
     let activo = true
     fetch('https://open.er-api.com/v6/latest/USD')
@@ -96,47 +113,45 @@ export default function Catalog({ user }) {
 
   return (
     <>
-      <div className="db-page-header">
-        <div>
-          <h1 className="db-page-header__title">Catálogo de Cursos</h1>
-          <p className="db-page-header__sub">Explora los cursos disponibles</p>
-        </div>
-      </div>
+      <header className="cat-header">
+        <h1 className="cat-header__title">Catalogo de Cursos</h1>
+        <p className="cat-header__sub">Explora los cursos disponibles y avanza a tu ritmo</p>
+      </header>
 
-      <div className="cat-toolbar">
-        <input
-          className="cat-search"
-          type="search"
-          placeholder="Buscar por nombre del curso..."
-          value={busqueda}
-          onChange={(e) => setBusqueda(e.target.value)}
-          aria-label="Buscar curso por nombre"
-        />
-        <select
-          className="cat-filter"
-          value={instructor}
-          onChange={(e) => setInstructor(e.target.value)}
-          aria-label="Filtrar por instructor"
-        >
-          {instructores.map((nom) => (
-            <option key={nom} value={nom}>
-              {nom === 'Todos' ? 'Todos los instructores' : nom}
-            </option>
-          ))}
-        </select>
-        <select
-          className="cat-filter"
-          value={moneda}
-          onChange={(e) => setMoneda(e.target.value)}
-          aria-label="Moneda"
-        >
-          {MONEDAS.map((m) => (
-            <option key={m} value={m}>
-              {m}
-            </option>
-          ))}
-        </select>
-      </div>
+      <search className="cat-toolbar">
+        <label className="cat-search">
+          <Search size={16} className="cat-search__icon" aria-hidden="true" />
+          <span className="sr-only">Buscar curso por nombre</span>
+          <input
+            type="search"
+            placeholder="Busca por nombre del curso"
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+          />
+        </label>
+
+        <label className="cat-filter">
+          <span className="sr-only">Filtrar por instructor</span>
+          <select value={instructor} onChange={(e) => setInstructor(e.target.value)}>
+            {instructores.map((nom) => (
+              <option key={nom} value={nom}>
+                {nom === 'Todos' ? 'Todos los instructores' : nom}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="cat-filter">
+          <span className="sr-only">Moneda</span>
+          <select value={moneda} onChange={(e) => setMoneda(e.target.value)}>
+            {MONEDAS.map((m) => (
+              <option key={m} value={m}>
+                {m}
+              </option>
+            ))}
+          </select>
+        </label>
+      </search>
 
       {estado === 'loading' && <p className="cat-msg">Cargando cursos...</p>}
       {estado === 'no-api' && (
@@ -150,40 +165,45 @@ export default function Catalog({ user }) {
         (filtrados.length === 0 ? (
           <p className="cat-msg">No se encontraron cursos.</p>
         ) : (
-          <section className="cat-grid" aria-label="Cursos">
+          <ul className="cat-grid" aria-label="Cursos">
             {filtrados.map((c) => (
-              <article className="cat-card" key={c.id}>
-                <div className="cat-card__thumb" aria-hidden="true">
-                  {c.nombre.charAt(0)}
-                </div>
-                <div className="cat-card__body">
-                  <h3 className="cat-card__title">{c.nombre}</h3>
-                  <p className="cat-card__instructor">{c.instructor}</p>
-                  <div className="cat-card__meta">
-                    <span className="cat-card__price">
-                      {formatearPrecio(c.precio, moneda, tasas)}
-                    </span>
-                    <span className="cat-card__rating">
-                      {c.calificacion != null ? `Calif: ${c.calificacion}` : 'Sin calificación'}
-                    </span>
-                  </div>
-                  {c.inscrito ? (
-                    <button className="cat-card__enroll" disabled>
-                      Inscrito
-                    </button>
-                  ) : (
-                    <button
-                      className="cat-card__enroll"
-                      onClick={() => inscribir(c.id)}
-                      disabled={inscribiendo === c.id || !user?.id}
-                    >
-                      {inscribiendo === c.id ? 'Inscribiendo...' : 'Inscribirse'}
-                    </button>
-                  )}
-                </div>
-              </article>
+              <li className="cat-card-item" key={c.id}>
+                <article className="cat-card">
+                  <figure className="cat-card__thumb" aria-hidden="true">
+                    {c.nombre.charAt(0)}
+                  </figure>
+                  <section className="cat-card__body">
+                    <h3 className="cat-card__title">{c.nombre}</h3>
+                    <p className="cat-card__instructor">{c.instructor}</p>
+                    <p className="cat-card__rating">
+                      {c.calificacion != null ? (
+                        <>
+                          <strong>{c.calificacion.toFixed(1)}</strong>
+                          <Estrellas valor={c.calificacion} />
+                        </>
+                      ) : (
+                        <span className="cat-card__rating--none">Sin calificacion</span>
+                      )}
+                    </p>
+                    <p className="cat-card__price">{formatearPrecio(c.precio, moneda, tasas)}</p>
+                    {c.inscrito ? (
+                      <button className="cat-card__enroll cat-card__enroll--done" disabled>
+                        Inscrito
+                      </button>
+                    ) : (
+                      <button
+                        className="cat-card__enroll"
+                        onClick={() => inscribir(c.id)}
+                        disabled={inscribiendo === c.id || !user?.id}
+                      >
+                        {inscribiendo === c.id ? 'Inscribiendo...' : 'Inscribirse'}
+                      </button>
+                    )}
+                  </section>
+                </article>
+              </li>
             ))}
-          </section>
+          </ul>
         ))}
     </>
   )
