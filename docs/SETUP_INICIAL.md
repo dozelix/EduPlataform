@@ -46,22 +46,32 @@ Desde la raíz (npm workspaces instala todos los paquetes de una vez):
 npm install
 ```
 
-El proyecto usa, entre otros: Electron 39, React 18, Vite 8, Mongoose 8, bcryptjs,
-ESLint 10, Prettier 3, Vitest 4 (ver `package.json` raíz para versiones exactas).
+El proyecto usa, entre otros: Electron 39, React 18, Vite 8, Tailwind v4 (`@tailwindcss/vite`),
+lucide-react, Mongoose 8, bcryptjs, ESLint, Prettier, Vitest (ver `package.json` para versiones).
 
 ---
 
-## 4. Variables de entorno
+## 4. Base de datos y seed (Caso 3)
 
-Crea un archivo `.env.local` en la raíz del proyecto (está ignorado por git):
+1. **MongoDB debe estar corriendo** en `localhost:27017`. `connection.js` conecta por defecto a la
+   base `eduplatform` (no hace falta `.env.local`; si lo creas, define `MONGODB_URI`).
+2. **Cargar el seed** una vez (si la base está vacía). El archivo usa helpers de mongosh (`use`),
+   así que se carga por stdin:
 
-```env
-MONGODB_URI=mongodb://localhost:27017/eduplatform
-NODE_ENV=development
+```bash
+mongosh "mongodb://localhost:27017" < seeds/eduplatform.seed.js
 ```
 
-> La conexión usa `process.env.MONGODB_URI`. Si la variable no existe, `connection.js`
-> cae a un valor por defecto. Define siempre la URI con la base `eduplatform`.
+El seed crea las colecciones del caso (`usuarios`, `cursos`, `lecciones`, `inscripciones`,
+`comentarios`) con sus inconsistencias intencionales y la contraseña de desarrollo `edu12345`.
+
+Para el dataset de volumen del issue #22 (100 cursos, 999 estudiantes, 99 profesores + 2 usuarios
+de testeo), usar el seed de volumen (idempotente). Detalle del modelo en
+[MODELO_NOSQL.md](MODELO_NOSQL.md):
+
+```bash
+mongosh "mongodb://localhost:27017" < seeds/eduplatform.volume.seed.js
+```
 
 ---
 
@@ -93,9 +103,14 @@ function createWindow() {
 
 app.on('ready', async () => {
   await connectDB()
-  await import('./ipc/userHandlers.js') // registrar handlers antes de abrir la ventana
   createWindow()
+  await import('./ipc/authHandlers.js')
+  await import('./ipc/courseHandlers.js')
+  await import('./ipc/learningHandlers.js')
+  await import('./ipc/lessonHandlers.js')
 })
+// Nota: el codigo real registra los handlers DESPUES de createWindow; hay una
+// race condition conocida (ver docs/AUDITORIA.md). Lo ideal es registrarlos antes.
 ```
 
 ### `packages/main/src/preload.cjs`
@@ -129,34 +144,36 @@ export async function connectDB() {
 }
 ```
 
-### `packages/main/src/db/models/User.js`
+### `packages/main/src/db/models/Usuario.js`
 
-El esquema real incluye `password` (hasheado con bcryptjs) y `role`:
+Modelo de la colección `usuarios` del seed (campos en español, `password` con bcryptjs):
 
 ```javascript
 import { Schema, model } from 'mongoose'
 import bcrypt from 'bcryptjs'
 
-const userSchema = new Schema({
-  name: { type: String, required: true, trim: true },
+const usuarioSchema = new Schema({
+  nombre: { type: String, required: true, trim: true },
   email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-  password: { type: String, required: true, minlength: 6, select: false },
-  role: { type: String, enum: ['admin', 'teacher', 'student'], default: 'student' }
-}, { timestamps: true })
+  tipo: { type: String, enum: ['estudiante', 'instructor'], default: 'estudiante' },
+  password: { type: String, minlength: 6, select: false },
+}, { collection: 'usuarios' })
 
-userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next()
+usuarioSchema.pre('save', async function (next) {
+  if (!this.isModified('password') || !this.password) return next()
   const salt = await bcrypt.genSalt(10)
   this.password = await bcrypt.hash(this.password, salt)
   next()
 })
 
-userSchema.methods.comparePassword = function (plain) {
+usuarioSchema.methods.comparePassword = function (plain) {
   return bcrypt.compare(plain, this.password)
 }
 
-export const User = model('User', userSchema)
+export const Usuario = model('Usuario', usuarioSchema)
 ```
+
+Detalle de autenticación en [AUTH_GUIDE.md](AUTH_GUIDE.md).
 
 ---
 
@@ -183,8 +200,9 @@ npm run test           # Vitest
 ## Checklist de validación del setup
 
 * [ ] Node.js v18+ y Git instalados.
-* [ ] MongoDB corriendo localmente (o URI accesible).
+* [ ] MongoDB corriendo en `localhost:27017`.
 * [ ] `npm install` ejecutado desde la raíz.
-* [ ] `.env.local` con `MONGODB_URI` apuntando a la base `eduplatform`.
+* [ ] Seed cargado en la base `eduplatform` (`mongosh ... < seeds/eduplatform.seed.js`).
 * [ ] El bridge está en `packages/main/src/preload.cjs` (extensión `.cjs`).
-* [ ] `npm run dev` abre la ventana de Electron sin errores y conecta a la BD.
+* [ ] `npm run dev` abre la ventana de Electron, conecta a la BD y el login entra con
+  `estudiante1@edu.cl` / `edu12345`.

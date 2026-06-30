@@ -7,7 +7,7 @@ Referencia rápida del workflow del equipo de 3 desarrolladores.
 ### Ramas de desarrollo
 
 ```
-main                  # Rama de producción protegida (NUNCA commitear directo)
+master                # Rama de producción protegida (NUNCA commitear directo)
 develop               # Rama de desarrollo principal
 ├── feature/*         # Nuevas funcionalidades (ej: feature/dashboard-ui)
 ├── bugfix/*          # Corrección de errores (ej: bugfix/auth-error)
@@ -30,21 +30,21 @@ develop               # Rama de desarrollo principal
 ## Flujo de trabajo (resumen)
 
 ```bash
-# Crear rama desde main actualizado
-git checkout main && git pull origin main
+# Crear rama desde master actualizado
+git checkout master && git pull origin master
 git checkout -b feature/nombre
 
 # Trabajo + commits semánticos
 git commit -m "feat(scope): descripción"
 
-# Integrar main antes de abrir PR
-git fetch origin && git rebase origin/main
+# Integrar master antes de abrir PR
+git fetch origin && git rebase origin/master
 
 # Push y PR (requiere 1 aprobación + CI verde)
 git push origin feature/nombre
 ```
 
-Regla de oro: **nunca commits directos a `main`**.
+Regla de oro: **nunca commits directos a `master`**.
 
 ---
 
@@ -75,10 +75,10 @@ La label determina el asignado automático (via `auto-assign.yml`).
 
 ## CI automático en PRs
 
-Al abrir un PR contra `main` corre automáticamente:
+Al abrir un PR contra `master` corre automáticamente:
 
 1. `npm run lint` — calidad de código
-2. `npm test -- --run` — suite de tests
+2. `npm test -- --run` — suite de tests (pendiente: aún no hay tests en el repo)
 3. `npm run build:frontend` — verificación de compilación
 4. Reporte de docs sin actualizar en más de 90 días
 
@@ -87,5 +87,6 @@ Al abrir un PR contra `main` corre automáticamente:
 ## Checklist antes del push
 
 ```bash
-npm run format && npm run lint && npm test -- --run
+npm run format && npm run lint
+# npm test -- --run  (pendiente: aún no hay tests en el repo)
 ```

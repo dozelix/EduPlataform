@@ -48,7 +48,6 @@ app.on('ready', async () => {
 
   // Carga dinámica de handlers IPC nativos
   await import('./ipc/authHandlers.js')
-  await import('./ipc/userHandlers.js')
   await import('./ipc/courseHandlers.js')
   await import('./ipc/learningHandlers.js')
   await import('./ipc/lessonHandlers.js')

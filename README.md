@@ -28,12 +28,11 @@
 
 ### Características Principales
 
-- ✅ Autenticación de usuarios (Login/Register)
-- ✅ Panel de control (Dashboard) con estadísticas
-- ✅ Gestión de cursos
-- ✅ Sistema de calificaciones
-- ✅ Interfaz responsive dark-mode
-- 🔧 Herramienta de prueba de conexión BD
+- Login de estudiantes e instructores
+- Catálogo de cursos (filtro por instructor, búsqueda, inscribirse, precio en varias monedas)
+- Mi Aprendizaje (progreso por curso, última lección)
+- Lección (video, comentarios, marcar como completada, siguiente lección)
+- Interfaz tipo Udemy (tema claro, Tailwind)
 
 ---
 
@@ -41,14 +40,13 @@
 
 | Capa | Tecnologías |
 |------|-------------|
-| **Desktop** | Electron 39.8.5, Electron Builder 26.15.2 |
-| **Frontend** | React 18.2.0, Vite 8.0.16, React Router 6.22.0 |
-| **Styling** | CSS 3 (Dark Mode, CSS Variables) |
-| **Backend** | Node.js, Electron IPC |
-| **Base de Datos** | MongoDB, Mongoose 8.0.0 |
+| **Desktop** | Electron 39, Electron Builder |
+| **Frontend** | React 18 (JSX), Vite 8 |
+| **Styling** | Tailwind v4 + lucide-react (tema claro tipo Udemy) + CSS heredado |
+| **Backend** | Node.js, Electron IPC (pseudo-backend) |
+| **Base de Datos** | MongoDB, Mongoose 8 (base `eduplatform`) |
 | **Development** | Concurrently, Cross-env, ESLint, Prettier |
-| **Testing** | Vitest 4.1.8 |
-| **Deploy** | GitHub Pages, gh-pages |
+| **Testing** | Vitest |
 
 ---
 
@@ -57,25 +55,25 @@
 ```
 EduPlataform/
 ├── packages/
-│   ├── frontend/                 # Aplicación React
+│   ├── frontend/                 # Aplicación React (Vite + Tailwind)
 │   │   ├── src/
-│   │   │   ├── components/       # Componentes reutilizables
-│   │   │   ├── features/         # Módulos de funcionalidad
-│   │   │   ├── data/             # Datos estáticos
-│   │   │   ├── styles/           # Hojas de estilos
+│   │   │   ├── components/       # LoginRegister, Sidebar, Topbar, icons
+│   │   │   ├── features/         # courses/Catalog, learning/MyLearning, lesson/Lesson
+│   │   │   ├── styles/           # index, tailwind, main + CSS por vista
 │   │   │   ├── app.jsx           # Componente principal
 │   │   │   └── main.jsx          # Entry point
-│   │   └── vite.config.js        # Configuración Vite
-│   ├── main/                     # Proceso principal Electron
+│   │   └── vite.config.js        # Configuración Vite (+ plugin Tailwind)
+│   ├── main/                     # Proceso principal Electron (pseudo-backend)
 │   │   ├── src/
-│   │   │   ├── db/               # Conexión y modelos MongoDB
-│   │   │   ├── ipc/              # Handlers de canales IPC
+│   │   │   ├── db/               # connection.js + models/Usuario.js
+│   │   │   ├── ipc/              # auth/course/learning/lesson Handlers
 │   │   │   ├── index.js          # Entry point Electron
 │   │   │   └── preload.cjs       # Bridge IPC seguro (window.api)
 │   └── shared/                   # Código compartido
-│       └── ipc/                  # Definición de canales
-├── docs/                         # Documentación centralizada
-├── dist-gh/                      # Build para GitHub Pages
+│       └── ipc/                  # Definición de canales (channels.js)
+├── seeds/                        # Seed del Caso 3 (eduplatform.seed.js)
+├── Documentacion docente/        # Pauta oficial del caso (schema.sql, mongodb_existente.js, PDF)
+├── docs/                         # Documentación interna (ver docs/FUENTE_DE_VERDAD.md)
 ├── package.json                  # Root workspace
 ├── README.md                     # Este archivo
 └── SECURITY.md                   # Política de seguridad
@@ -112,9 +110,12 @@ EduPlataform/
      NODE_ENV=development
      ```
 
-4. **Verificar conexión a MongoDB**
-   - La aplicación incluye una herramienta DBTester en Configuración
-   - Utilizar para validar la conexión antes de usar la app
+4. **Cargar el seed del Caso 3** (con MongoDB corriendo)
+   ```bash
+   mongosh "mongodb://localhost:27017" < seeds/eduplatform.seed.js
+   ```
+   - Crea las colecciones `usuarios`, `cursos`, `lecciones`, `inscripciones`, `comentarios`.
+   - Login de prueba: `estudiante1@edu.cl` / `edu12345`.
 
 ---
 
@@ -177,17 +178,19 @@ Toda la documentación centralizada está en el directorio [docs/](docs/):
 
 | Documento | Propósito |
 |-----------|-----------|
+| [FUENTE_DE_VERDAD.md](docs/FUENTE_DE_VERDAD.md) | Empieza aquí. Pauta real (relacional a NoSQL, volumen) y errores de los docs internos |
+| [MODELO_NOSQL.md](docs/MODELO_NOSQL.md) | Modelo documental y seed de volumen (100 cursos / 999 estudiantes / 99 profesores) |
 | [SETUP_INICIAL.md](docs/SETUP_INICIAL.md) | Guía de instalación y configuración inicial |
 | [ESTRUCTURA_PROYECTO.md](docs/ESTRUCTURA_PROYECTO.md) | Descripción detallada de estructura y convenciones |
 | [AUTH_GUIDE.md](docs/AUTH_GUIDE.md) | Sistema de autenticación y login/register |
 | [DOCUMENTACION.md](docs/DOCUMENTACION.md) | Índice central de la documentación |
 | [REGLAS_COLABORACION.md](docs/REGLAS_COLABORACION.md) | Normas para contribuciones y código |
 | [SECURITY.md](SECURITY.md) | Política de seguridad y vulnerabilidades |
-| [TAREAS.md](TAREAS.md) | Backlog de tareas del equipo |
+| [AUDITORIA.md](docs/AUDITORIA.md) | Auditoría: hallazgos verificados (seguridad, funcional, docs) |
 
 ### Resumen de Problemas Conocidos
 
-Revisar [informe QA.md](informe%20QA.md) para lista de:
+Revisar [docs/AUDITORIA.md](docs/AUDITORIA.md) para lista de:
 - ❌ Problemas críticos (seguridad IPC)
 - ⚠️ Problemas de diseño (CSS duplicado, colisiones)
 - 🔧 Áreas en construcción

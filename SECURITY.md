@@ -29,21 +29,22 @@ El preload expone exclusivamente `window.api.invoke` y `window.api.on` mediante
 ## Problemas de seguridad conocidos
 
 Identificados en la revisión de QA, pendientes de corrección. Se listan para transparencia
-del equipo. Detalle completo en [informe QA.md](informe%20QA.md).
+del equipo. Detalle completo en [docs/AUDITORIA.md](docs/AUDITORIA.md).
 
 ### CRÍTICO — Sin whitelist de canales IPC
 
 **Archivo:** `packages/main/src/preload.cjs`
 
-`window.api.invoke(channel, ...args)` acepta cualquier string como canal sin validación.
-En modo producción la app carga desde GitHub Pages; si esa URL fuera comprometida, un
-script malicioso podría invocar handlers IPC arbitrarios (`user:delete`, `user:create`…).
+`window.api.invoke(channel, ...args)` acepta cualquier string como canal sin validación. Si la
+página del renderer fuera comprometida, un script podría invocar handlers IPC arbitrarios
+(`inscripcion:crear`, `comentario:crear`, `leccion:completar`…).
 
 **Solución pendiente:**
 ```js
 const ALLOWED = ['auth:login', 'auth:register', 'auth:logout',
-                 'user:get-all', 'user:get-by-id', 'user:create',
-                 'user:update', 'user:delete']
+                 'curso:listar', 'aprendizaje:listar', 'inscripcion:crear',
+                 'leccion:obtener', 'leccion:completar',
+                 'comentario:listar', 'comentario:crear']
 
 invoke: (channel, ...args) => {
   if (!ALLOWED.includes(channel)) throw new Error(`Canal no permitido: ${channel}`)
@@ -51,26 +52,10 @@ invoke: (channel, ...args) => {
 }
 ```
 
-### ALTO — `user:get-all` devuelve hashes de contraseña
-
-**Archivo:** `packages/main/src/ipc/userHandlers.js` línea 101
-
-`User.find().lean()` no excluye el campo `password`. Aunque el hash no es texto plano,
-viola el principio de mínimo privilegio.
-
-**Solución pendiente:** `User.find().select('-password').lean()`
-
-### ALTO — `user:create` omite validaciones de autenticación
-
-**Archivo:** `packages/main/src/ipc/userHandlers.js` línea 120
-
-El handler acepta `userData` sin validar email, longitud de contraseña ni rol. Permite crear
-usuarios `admin` sin pasar por el flujo de `auth:register`.
-
 ### MEDIO — Sin persistencia de sesión
 
-La sesión activa vive únicamente en el estado de React. El canal `auth:get-current` está
-definido en `packages/shared/src/ipc/channels.js` pero sin implementación en el backend.
+La sesión activa vive únicamente en el estado de React: al recargar el renderer hay que volver a
+iniciar sesión. No hay token ni almacenamiento de sesión.
 
 ### MEDIO — `connectDB` termina el proceso con `process.exit(1)`
 
@@ -83,7 +68,6 @@ Si MongoDB no está disponible, Electron cierra abruptamente sin mensaje al usua
 ## Checklist de seguridad pre-producción
 
 - [ ] Implementar whitelist de canales IPC en `preload.cjs`
-- [ ] Excluir `password` de `user:get-all` con `.select('-password')`
 - [ ] Validar/sanitizar todo input en los handlers IPC (Main Process)
 - [ ] Configurar autenticación de MongoDB con credenciales fuertes
 - [ ] Deshabilitar dev tools en builds de producción: `webPreferences: { devTools: false }`
@@ -95,7 +79,7 @@ Si MongoDB no está disponible, Electron cierra abruptamente sin mensaje al usua
 
 ## Hashing de contraseñas
 
-Se usa **bcryptjs** con salt rounds 10 (ver `packages/main/src/db/models/User.js`).
+Se usa **bcryptjs** con salt rounds 10 (ver `packages/main/src/db/models/Usuario.js`).
 El hash se aplica en un hook `pre('save')` del esquema; la verificación usa
 `userSchema.methods.comparePassword`. Longitud mínima de contraseña: 6 caracteres
 (validada en el modelo y en `auth:register`).
