@@ -292,6 +292,23 @@
   opacity: 0.85;
 }
 
+.db-topbar__login {
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary);
+  color: #fff;
+  border: 1px solid var(--color-primary);
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity var(--transition);
+}
+
+.db-topbar__login:hover {
+  opacity: 0.9;
+}
+
 /* ── Content area ────────────────────────────────────── */
 .db-content {
   flex: 1;

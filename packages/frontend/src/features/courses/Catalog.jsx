@@ -35,7 +35,7 @@ function Estrellas({ valor }) {
   )
 }
 
-export default function Catalog({ user }) {
+export default function Catalog({ user, onRequireLogin }) {
   const [cursos, setCursos] = useState([])
   const [estado, setEstado] = useState('loading') // loading | ready | error | no-api
   const [error, setError] = useState('')
@@ -193,8 +193,8 @@ export default function Catalog({ user }) {
                     ) : (
                       <button
                         className="cat-card__enroll"
-                        onClick={() => inscribir(c.id)}
-                        disabled={inscribiendo === c.id || !user?.id}
+                        onClick={() => (user?.id ? inscribir(c.id) : onRequireLogin?.(c.id))}
+                        disabled={inscribiendo === c.id}
                       >
                         {inscribiendo === c.id ? 'Inscribiendo...' : 'Inscribirse'}
                       </button>

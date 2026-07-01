@@ -95,11 +95,11 @@ export default function MyLearning({ user, onContinue }) {
                   <td>
                     <button
                       className="lrn-continue"
-                      onClick={() => onContinue?.(f.primeraLeccionId)}
-                      disabled={!f.disponible || !f.primeraLeccionId}
+                      onClick={() => onContinue?.(f.continuarLeccionId)}
+                      disabled={!f.disponible || !f.continuarLeccionId}
                       title={
                         f.disponible
-                          ? f.primeraLeccionId
+                          ? f.continuarLeccionId
                             ? ''
                             : 'El curso no tiene lecciones'
                           : 'Curso no disponible'

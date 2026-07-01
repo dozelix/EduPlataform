@@ -42,7 +42,7 @@ ipcMain.handle('aprendizaje:listar', async (_, usuarioId) => {
           instructor: '—',
           progreso,
           ultimaLeccion: '—',
-          primeraLeccionId: null,
+          continuarLeccionId: null,
           disponible: false,
         }
       }
@@ -51,8 +51,16 @@ ipcMain.handle('aprendizaje:listar', async (_, usuarioId) => {
       const lecsCurso = lecciones
         .filter((l) => l.curso_id?.toString() === curso._id.toString())
         .sort((a, b) => (a.numero || 0) - (b.numero || 0))
-      const ultimaLeccion = lecsCurso.length ? lecsCurso[lecsCurso.length - 1].titulo : '—'
-      const primeraLeccionId = lecsCurso.length ? lecsCurso[0]._id.toString() : null
+
+      // Progreso real: lecciones que el usuario ya marcó como completadas.
+      const completadas = new Set((ins.lecciones_completadas || []).map((x) => x.toString()))
+      const completadasEnOrden = lecsCurso.filter((l) => completadas.has(l._id.toString()))
+
+      // "Continuar" lleva a la primera lección pendiente; si ya completó todas, a la
+      // última (repaso). "Última lección" es la última que efectivamente completó.
+      const pendiente = lecsCurso.find((l) => !completadas.has(l._id.toString()))
+      const continuar = pendiente || lecsCurso[lecsCurso.length - 1] || null
+      const ultima = completadasEnOrden[completadasEnOrden.length - 1] || null
 
       return {
         inscripcionId: ins._id.toString(),
@@ -60,8 +68,8 @@ ipcMain.handle('aprendizaje:listar', async (_, usuarioId) => {
         curso: curso.nombre,
         instructor: instructorPorId.get(curso.instructor_id?.toString()) || 'Instructor desconocido',
         progreso,
-        ultimaLeccion,
-        primeraLeccionId,
+        ultimaLeccion: ultima ? ultima.titulo : 'Sin empezar',
+        continuarLeccionId: continuar ? continuar._id.toString() : null,
         disponible: true,
       }
     })

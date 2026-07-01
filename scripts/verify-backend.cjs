@@ -58,7 +58,9 @@ async function main() {
   check('busqueda por nombre devuelve resultados', catalogo.filter((c) => c.nombre.toLowerCase().includes(q)).length >= 1);
   check('filtro por instructor devuelve resultados', catalogo.filter((c) => c.instructor === catalogo[0].instructor).length >= 1);
 
-  // aprendizaje:listar (Mi Aprendizaje).
+  // aprendizaje:listar (Mi Aprendizaje) — logica con progreso real (lecciones_completadas):
+  // "Continuar" apunta a la primera leccion pendiente (no a la 1 fija) y "Ultima leccion"
+  // es la ultima efectivamente completada. Espeja el handler learningHandlers.js.
   const lecciones = await db.collection('lecciones').find().toArray();
   const cursoPorId = new Map(cursos.map((c) => [c._id.toString(), c]));
   const aprendizaje = ins.map((i) => {
@@ -66,15 +68,36 @@ async function main() {
     const lecs = lecciones
       .filter((l) => l.curso_id && curso && l.curso_id.toString() === curso._id.toString())
       .sort((a, b) => (a.numero || 0) - (b.numero || 0));
-    return { disponible: !!curso, primeraLeccionId: lecs.length ? lecs[0]._id.toString() : null };
+    const completadas = new Set((i.lecciones_completadas || []).map((x) => x.toString()));
+    const completadasEnOrden = lecs.filter((l) => completadas.has(l._id.toString()));
+    const pendiente = lecs.find((l) => !completadas.has(l._id.toString()));
+    const continuar = pendiente || lecs[lecs.length - 1] || null;
+    const ultima = completadasEnOrden[completadasEnOrden.length - 1] || null;
+    const primeraId = lecs.length ? lecs[0]._id.toString() : null;
+    return {
+      disponible: !!curso,
+      totalLecs: lecs.length,
+      nCompletadas: completadasEnOrden.length,
+      continuarLeccionId: continuar ? continuar._id.toString() : null,
+      ultimaLeccion: ultima ? ultima.titulo : 'Sin empezar',
+      primeraCompletada: primeraId ? completadas.has(primeraId) : false,
+      continuarEsPrimera: continuar && primeraId ? continuar._id.toString() === primeraId : false,
+    };
   });
   check('aprendizaje:listar devuelve las inscripciones del alumno', aprendizaje.length === ins.length, aprendizaje.length + ' filas');
   check('cada fila tiene curso disponible', aprendizaje.every((f) => f.disponible));
-  check('hay una primera leccion para "Continuar"', aprendizaje.some((f) => f.primeraLeccionId));
+  check('hay una leccion para "Continuar"', aprendizaje.some((f) => f.continuarLeccionId));
+
+  // Progreso real: en cursos donde la leccion 1 ya esta completada (y no todo el curso),
+  // "Continuar" NO debe volver a la leccion 1 y "Ultima leccion" no debe ser "Sin empezar".
+  const conProgreso = aprendizaje.filter((f) => f.primeraCompletada && f.nCompletadas < f.totalLecs);
+  check('hay cursos con la leccion 1 ya completada para probar el progreso', conProgreso.length > 0, conProgreso.length + ' cursos');
+  check('"Continuar" respeta el progreso (no vuelve a la leccion 1)', conProgreso.every((f) => !f.continuarEsPrimera));
+  check('cursos ya empezados muestran ultima leccion (no "Sin empezar")', conProgreso.every((f) => f.ultimaLeccion !== 'Sin empezar'));
 
   // leccion:obtener + comentario:listar (Leccion).
-  const conLeccion = aprendizaje.find((f) => f.primeraLeccionId);
-  const lid = new OID(conLeccion.primeraLeccionId);
+  const conLeccion = aprendizaje.find((f) => f.continuarLeccionId);
+  const lid = new OID(conLeccion.continuarLeccionId);
   const leccion = await db.collection('lecciones').findOne({ _id: lid });
   check('leccion:obtener devuelve la leccion', !!leccion, leccion && leccion.titulo);
   const hermanas = await db.collection('lecciones').find({ curso_id: leccion.curso_id }).sort({ numero: 1 }).toArray();

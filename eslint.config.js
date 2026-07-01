@@ -37,4 +37,15 @@ module.exports = [
       },
     },
   },
+  {
+    // Scripts de utilidad/verificación que corren en Node (require, process, console).
+    files: ['scripts/**/*.{js,cjs}'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      sourceType: 'commonjs',
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
 ];

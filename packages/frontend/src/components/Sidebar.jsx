@@ -12,7 +12,15 @@ const NAV_ITEMS = [
   { id: 'learning', icon: <IconBarChart />, label: 'Mi Aprendizaje' },
 ]
 
-export default function Sidebar({ activeNav, sidebarOpen, setSidebarOpen, handleNav, dbStatus }) {
+export default function Sidebar({
+  activeNav,
+  sidebarOpen,
+  setSidebarOpen,
+  handleNav,
+  isAuthenticated,
+  onLogout,
+  dbStatus,
+}) {
   return (
     <>
       {sidebarOpen && (
@@ -90,10 +98,12 @@ export default function Sidebar({ activeNav, sidebarOpen, setSidebarOpen, handle
               <span>DB: {dbStatus.toUpperCase()}</span>
             </div>
           )}
-          <button className="db-sidebar__logout">
-            <IconLogOut />
-            Cerrar sesión
-          </button>
+          {isAuthenticated && (
+            <button className="db-sidebar__logout" onClick={onLogout}>
+              <IconLogOut />
+              Cerrar sesión
+            </button>
+          )}
         </div>
       </aside>
     </>

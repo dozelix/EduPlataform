@@ -23,7 +23,7 @@ const FIELD_WRAP =
 const FIELD = 'flex-1 text-sm text-[#1c1d1f] outline-none bg-transparent placeholder:text-[#9ba0a6]'
 const FIELD_LABEL = 'text-sm font-semibold text-[#1c1d1f]'
 
-export function LoginRegister({ onSuccess }) {
+export function LoginRegister({ onSuccess, onCancel }) {
   const [mode, setMode] = useState('login')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -140,12 +140,22 @@ export function LoginRegister({ onSuccess }) {
           <BookOpen size={22} className="text-[#3b1c8c]" />
           <span className="text-xl font-extrabold text-[#3b1c8c]">EduPlatform</span>
         </div>
-        <p className="text-sm text-[#6a6f73]">
-          {mode === 'login' ? '¿No tienes cuenta? ' : '¿Ya tienes cuenta? '}
-          <button onClick={switchMode} className="text-[#3b1c8c] font-semibold hover:underline">
-            {mode === 'login' ? 'Registrate gratis' : 'Inicia sesion'}
-          </button>
-        </p>
+        <div className="flex items-center gap-5">
+          {onCancel && (
+            <button
+              onClick={onCancel}
+              className="text-sm text-[#6a6f73] font-medium hover:text-[#1c1d1f] hover:underline"
+            >
+              Volver al catálogo
+            </button>
+          )}
+          <p className="text-sm text-[#6a6f73]">
+            {mode === 'login' ? '¿No tienes cuenta? ' : '¿Ya tienes cuenta? '}
+            <button onClick={switchMode} className="text-[#3b1c8c] font-semibold hover:underline">
+              {mode === 'login' ? 'Registrate gratis' : 'Inicia sesion'}
+            </button>
+          </p>
+        </div>
       </header>
 
       <div className="flex flex-1">
